@@ -86,6 +86,13 @@
   --max-width-wide: 1200px;
   --nav-height: 64px;
   --font-body: "Inter", var(--font-system);
+
+  /* Fluid type — stronger minimums on phones / narrow viewports */
+  --font-size-body: clamp(17px, 0.35rem + 3vw, 19px);
+  --font-size-ui: clamp(15px, 0.25rem + 2.8vw, 17px);
+  --font-size-small: clamp(14px, 0.2rem + 2.6vw, 16px);
+  --font-size-meta: clamp(13px, 0.2rem + 2.5vw, 14px);
+  --font-size-heading-sm: clamp(19px, 2.8vw, 24px);
   
   /* Transitions */
   --transition-fast: 0.2s ease;
@@ -118,8 +125,8 @@ html {
 
 body {
   font-family: var(--font-display);
-  font-size: clamp(15px, 2.8vw, 17px);
-  line-height: 1.8;
+  font-size: var(--font-size-body);
+  line-height: 1.75;
   font-weight: 400;
   letter-spacing: -0.022em;
   color: var(--color-black);
@@ -380,7 +387,7 @@ button, a, [role="button"] {
 }
 
 .nav-logo {
-  font-size: 16px;
+  font-size: clamp(16px, 0.2rem + 3vw, 18px);
   font-weight: 500;
   color: #ffffff;
   text-decoration: none;
@@ -405,7 +412,7 @@ button, a, [role="button"] {
 }
 
 .nav-links a {
-  font-size: 14px;
+  font-size: var(--font-size-ui);
   font-weight: 400;
   color: rgba(255, 255, 255, 0.85);
   text-decoration: none;
@@ -439,7 +446,7 @@ button, a, [role="button"] {
 }
 
 .nav-lang-toggle {
-  font-size: 13px;
+  font-size: var(--font-size-small);
   font-weight: 400;
   color: rgba(255, 255, 255, 0.85);
   background: transparent;
@@ -663,7 +670,7 @@ button, a, [role="button"] {
     inset 0 -1px 0 rgba(255, 255, 255, 0.05);
   cursor: pointer;
   font-family: var(--font-display);
-  font-size: 17px;
+  font-size: clamp(16px, 0.35rem + 3vw, 18px);
   font-weight: 600;
   letter-spacing: -0.022em;
   color: #ffffff;
@@ -759,7 +766,7 @@ button, a, [role="button"] {
   border: none;
   cursor: pointer;
   font-family: var(--font-display);
-  font-size: 17px;
+  font-size: clamp(16px, 0.35rem + 3vw, 18px);
   font-weight: 600;
   letter-spacing: -0.022em;
   color: #1d1d1f;
@@ -792,7 +799,7 @@ button, a, [role="button"] {
   align-items: center;
   justify-content: center;
   padding: 12px 24px;
-  font-size: 17px;
+  font-size: var(--font-size-ui);
   font-weight: 500;
   text-decoration: none;
   border-radius: 980px;
@@ -834,7 +841,7 @@ button, a, [role="button"] {
 }
 
 .section-title {
-  font-size: clamp(32px, 4vw, 48px);
+  font-size: clamp(34px, 4.5vw, 48px);
   font-weight: 600;
   letter-spacing: -0.025em;
   line-height: 1.35;
@@ -843,7 +850,7 @@ button, a, [role="button"] {
 }
 
 .section-subtitle {
-  font-size: 21px;
+  font-size: clamp(18px, 2.2vw, 22px);
   color: var(--color-gray);
   text-align: center;
   margin-bottom: var(--spacing-2xl);
@@ -861,7 +868,7 @@ button, a, [role="button"] {
 }
 
 .legal-title {
-  font-size: clamp(32px, 4vw, 48px);
+  font-size: clamp(34px, 4.5vw, 48px);
   font-weight: 600;
   letter-spacing: -0.025em;
   line-height: 1.35;
@@ -869,14 +876,14 @@ button, a, [role="button"] {
 }
 
 .legal-lead {
-  font-size: 19px;
+  font-size: clamp(17px, 2vw, 20px);
   color: var(--color-gray-dark);
   margin-bottom: var(--spacing-lg);
 }
 
 .legal-muted {
   color: var(--color-gray-light);
-  font-size: 15px;
+  font-size: var(--font-size-small);
 }
 
 .legal-content code {
@@ -888,14 +895,14 @@ button, a, [role="button"] {
 }
 
 .legal-content h2 {
-  font-size: 21px;
+  font-size: clamp(19px, 2.2vw, 22px);
   font-weight: 600;
   margin-top: var(--spacing-xl);
   margin-bottom: var(--spacing-sm);
 }
 
 .legal-content h3 {
-  font-size: 19px;
+  font-size: clamp(17px, 2vw, 20px);
   font-weight: 600;
   margin-top: var(--spacing-md);
   margin-bottom: var(--spacing-xs);
@@ -938,7 +945,7 @@ button, a, [role="button"] {
   background: none;
   border: none;
   color: var(--color-black);
-  font-size: 21px;
+  font-size: clamp(18px, 2.5vw, 22px);
   font-weight: 600;
   text-align: left;
   cursor: pointer;
@@ -1110,7 +1117,7 @@ button, a, [role="button"] {
   right: auto;
   z-index: 3;
   padding: 5px 11px;
-  font-size: 11px;
+  font-size: var(--font-size-meta);
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -1138,7 +1145,7 @@ button, a, [role="button"] {
 }
 
 .gallery-item-category {
-  font-size: 11px;
+  font-size: var(--font-size-meta);
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
@@ -1147,7 +1154,7 @@ button, a, [role="button"] {
 }
 
 .gallery-item-title {
-  font-size: 17px;
+  font-size: clamp(16px, 0.35rem + 3vw, 19px);
   font-weight: 600;
   color: #fff;
   letter-spacing: -0.02em;
@@ -1155,7 +1162,7 @@ button, a, [role="button"] {
 }
 
 .gallery-item-award {
-  font-size: 11px;
+  font-size: var(--font-size-meta);
   font-weight: 500;
   color: rgba(255, 255, 255, 0.7);
   letter-spacing: -0.01em;
@@ -1227,7 +1234,7 @@ button, a, [role="button"] {
   }
 
   .gallery-item-title {
-    font-size: 15px;
+    font-size: clamp(16px, 0.4rem + 3vw, 18px);
     line-height: 1.35;
   }
 
@@ -1238,6 +1245,35 @@ button, a, [role="button"] {
     left: auto;
     width: 27px;
     height: 27px;
+  }
+
+  /* Native horizontal scroll + touch scrub; autoscroll uses scrollLeft (see script.js) */
+  .gallery-row {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: none;
+    scroll-padding-inline: var(--spacing-lg);
+    touch-action: pan-x;
+    contain: none;
+    /* Scroll without showing overlay scrollbars (macOS Safari/Chrome, Firefox) */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .gallery-row::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  .gallery-row-track {
+    will-change: auto;
+  }
+
+  .gallery-arrow {
+    display: none !important;
   }
 }
 
@@ -1250,6 +1286,62 @@ button, a, [role="button"] {
   max-width: none;
   padding-left: 0;
   padding-right: 0;
+}
+
+/* Narrow window: portrait cards + tight column (same breakpoint as gallery rows 1–2) */
+@media (max-width: 900px) {
+  .section-apps-gallery {
+    --apps-gallery-card-width: min(
+      210px,
+      calc(100vw - 2 * var(--spacing-lg) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
+    );
+  }
+
+  .apps-gallery-scroller {
+    padding-left: max(20px, env(safe-area-inset-left, 0px), calc(50% - min(105px, 47vw)));
+    padding-right: max(20px, env(safe-area-inset-right, 0px), calc(50% - min(105px, 47vw)));
+  }
+
+  .apps-gallery-panel {
+    flex: 0 0 var(--apps-gallery-card-width);
+    width: var(--apps-gallery-card-width);
+    max-width: var(--apps-gallery-card-width);
+  }
+
+  .apps-gallery-panel-card {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .apps-gallery-image-wrap {
+    aspect-ratio: 9 / 16;
+  }
+
+  .apps-gallery-image-wrap--headshot img {
+    transform: scale(1.08);
+    transform-origin: center 30%;
+  }
+
+  .apps-gallery-caption {
+    padding: var(--spacing-md) var(--spacing-xs) var(--spacing-lg);
+    max-width: 100%;
+  }
+
+  .apps-gallery-caption-title {
+    font-size: clamp(1rem, 0.35rem + 2.8vw, 1.35rem);
+    line-height: 1.28;
+    overflow-wrap: anywhere;
+  }
+
+  .apps-gallery-desc-shell {
+    max-width: var(--apps-gallery-card-width);
+  }
+
+  .apps-gallery-desc-text {
+    font-size: clamp(15px, 0.22rem + 2.2vw, 17px);
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
 }
 
 /* Less space between Work spotlight (About) and Listen than default .section stacking */
@@ -1316,7 +1408,7 @@ button, a, [role="button"] {
   border: none;
   cursor: pointer;
   font-family: var(--font-display);
-  font-size: 14px;
+  font-size: var(--font-size-small);
   font-weight: 500;
   letter-spacing: -0.018em;
   color: var(--color-gray);
@@ -1352,6 +1444,24 @@ button, a, [role="button"] {
 
 .apps-gallery-tab:active:not([aria-selected="true"]) {
   transform: scale(0.98);
+}
+
+/* Narrow window: track flush to container; each tab stays a full pill (rounded capsule) */
+@media (max-width: 900px) {
+  .apps-gallery-tabs-shell {
+    padding: 0;
+    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .apps-gallery-tabs {
+    gap: 2px;
+  }
+
+  .apps-gallery-tab {
+    border-radius: 980px;
+  }
 }
 
 /* Horizontal scroll carousel — full-width track; cards are modest size, neighbors peek in */
@@ -1504,7 +1614,7 @@ button, a, [role="button"] {
 }
 
 .apps-gallery-caption-kicker {
-  font-size: 11px;
+  font-size: var(--font-size-meta);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1512,7 +1622,7 @@ button, a, [role="button"] {
 }
 
 .apps-gallery-caption-title {
-  font-size: clamp(18px, 2.5vw, 22px);
+  font-size: var(--font-size-heading-sm);
   font-weight: 600;
   letter-spacing: -0.025em;
   color: var(--color-black);
@@ -1520,7 +1630,7 @@ button, a, [role="button"] {
 }
 
 .apps-gallery-caption-award {
-  font-size: 13px;
+  font-size: var(--font-size-small);
   color: var(--color-gray);
   line-height: 1.45;
 }
@@ -1548,7 +1658,7 @@ button, a, [role="button"] {
   grid-column: 1;
   margin: 0;
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: clamp(16px, 0.25rem + 2.4vw, 17px);
   font-weight: 400;
   line-height: 1.65;
   letter-spacing: -0.011em;
@@ -1643,7 +1753,7 @@ button, a, [role="button"] {
 }
 
 .about-demos-title {
-  font-size: 21px;
+  font-size: clamp(18px, 2.2vw, 22px);
   font-weight: 600;
   color: var(--color-black);
   margin-bottom: var(--spacing-lg);
@@ -1717,7 +1827,7 @@ button, a, [role="button"] {
 }
 
 .demo-title {
-  font-size: 15px;
+  font-size: var(--font-size-ui);
   font-weight: 600;
   color: var(--color-black);
 }
@@ -1738,7 +1848,7 @@ button, a, [role="button"] {
 }
 
 .demo-time {
-  font-size: 11px;
+  font-size: var(--font-size-meta);
   font-variant-numeric: tabular-nums;
   color: var(--color-gray-light);
   flex-shrink: 0;
@@ -1980,7 +2090,7 @@ button, a, [role="button"] {
   min-height: 44px;
   padding: 0 22px;
   font-family: var(--font-display);
-  font-size: 17px;
+  font-size: var(--font-size-ui);
   font-weight: 600;
   letter-spacing: -0.022em;
   line-height: 1.17647;
@@ -2122,7 +2232,7 @@ button, a, [role="button"] {
   .contact-sheet-cta {
     min-height: 40px;
     padding: 0 18px;
-    font-size: 14px;
+    font-size: var(--font-size-small);
     line-height: 1.28571;
   }
 
@@ -2158,7 +2268,7 @@ button, a, [role="button"] {
   justify-content: center;
   align-items: center;
   gap: 0 var(--spacing-sm);
-  font-size: 12px;
+  font-size: clamp(13px, 0.2rem + 2.6vw, 15px);
   color: var(--color-gray-light);
 }
 
@@ -2227,8 +2337,8 @@ button, a, [role="button"] {
   }
 
   .apps-gallery-desc-text {
-    font-size: 14px;
-    line-height: 1.6;
+    font-size: clamp(16px, 0.3rem + 3.2vw, 18px);
+    line-height: 1.65;
   }
 
   .footer {
@@ -2255,8 +2365,14 @@ button, a, [role="button"] {
   }
 
   .hero-line {
-    font-size: clamp(22px, 5.5vw, 40px);
-    line-height: 1.45;
+    font-size: clamp(32px, 8.25vw, 54px);
+    line-height: 1.38;
+  }
+
+  .hero-cta-btn {
+    font-size: clamp(18px, 0.45rem + 3.8vw, 22px);
+    padding: 16px 32px;
+    min-height: 52px;
   }
 
   .gallery-item {
@@ -2264,12 +2380,6 @@ button, a, [role="button"] {
       210px,
       calc(100vw - 2 * var(--spacing-sm) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
     );
-  }
-
-  .apps-gallery-panel {
-    flex: 0 0 min(620px, calc(100vw - 2rem));
-    width: min(620px, calc(100vw - 2rem));
-    max-width: min(620px, calc(100vw - 2rem));
   }
 
   .gallery-row {
@@ -2543,7 +2653,7 @@ button, a, [role="button"] {
     max-width: 100%;
     margin-left: calc(-1 * var(--spacing-sm));
     margin-right: calc(-1 * var(--spacing-sm));
-    padding: 2px;
+    padding: 0;
     padding-left: max(var(--spacing-sm), env(safe-area-inset-left, 0px));
     padding-right: max(var(--spacing-sm), env(safe-area-inset-right, 0px));
     box-sizing: border-box;

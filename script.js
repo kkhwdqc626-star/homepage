@@ -666,18 +666,48 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Gallery: transform-based infinite auto-scroll (avoids scrollLeft quirks on flex)
+  // Gallery: infinite auto-scroll. Wide viewports use transform on the track; narrow viewports
+  // use native horizontal scroll on .gallery-row so touch/trackpad can scrub (same speeds).
   const galleryRows = document.querySelectorAll('.gallery-row');
-  const AUTOSCROLL_SPEEDS = [0.5, 0.35];
+  /* px per frame per row — second row slower than the first */
+  const AUTOSCROLL_SPEEDS = [0.25, 0.13];
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const galleryNativeScrollMq = window.matchMedia('(max-width: 900px)');
+  let autoscrollRafId = 0;
   const rowOffsets = new Map();
   const rowHalfWidthCache = new Map();
+  /** Skip scroll→rowOffsets sync when scrollLeft was set by autoscroll (same task). */
+  const galleryRowIgnoreScrollSync = new WeakSet();
   const getTrack = (row) => row?.querySelector('.gallery-row-track');
-  const getOffset = (row) => rowOffsets.get(row) ?? 0;
+  const normalizeOffset = (n, halfWidth) => {
+    if (!halfWidth) return 0;
+    let x = n;
+    while (x >= halfWidth) x -= halfWidth;
+    while (x < 0) x += halfWidth;
+    return x;
+  };
+  const getOffset = (row) => {
+    if (galleryNativeScrollMq.matches) {
+      const half = getHalfWidth(row);
+      return normalizeOffset(rowOffsets.get(row) ?? 0, half);
+    }
+    return rowOffsets.get(row) ?? 0;
+  };
   const setOffset = (row, val) => {
-    rowOffsets.set(row, val);
     const track = getTrack(row);
-    if (track) track.style.transform = `translate3d(${-val}px, 0, 0)`;
+    if (!track) return;
+    if (galleryNativeScrollMq.matches) {
+      track.style.transform = '';
+      galleryRowIgnoreScrollSync.add(row);
+      row.scrollLeft = val;
+      rowOffsets.set(row, val);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => galleryRowIgnoreScrollSync.delete(row));
+      });
+    } else {
+      rowOffsets.set(row, val);
+      track.style.transform = `translate3d(${-val}px, 0, 0)`;
+    }
   };
   const getHalfWidth = (row) => {
     let h = rowHalfWidthCache.get(row);
@@ -767,7 +797,51 @@ document.addEventListener('DOMContentLoaded', () => {
     rowOffsets.set(row, 0);
     setupRow(row);
     updateArrowsForRow(row);
+
+    row.addEventListener(
+      'scroll',
+      () => {
+        if (galleryNativeScrollMq.matches && !galleryRowIgnoreScrollSync.has(row)) {
+          rowOffsets.set(row, row.scrollLeft);
+        }
+      },
+      { passive: true }
+    );
   });
+
+  const syncGalleryNativeScrollMode = () => {
+    rowHalfWidthCache.clear();
+    galleryRows.forEach((row) => {
+      const track = getTrack(row);
+      if (!track) return;
+      if (galleryNativeScrollMq.matches) {
+        const half = getHalfWidth(row);
+        const fromTransform = rowOffsets.get(row) ?? 0;
+        track.style.transform = '';
+        const sx = normalizeOffset(fromTransform, half);
+        row.scrollLeft = sx;
+        rowOffsets.set(row, sx);
+      } else {
+        const half = getHalfWidth(row);
+        const fromScroll = normalizeOffset(row.scrollLeft, half);
+        rowOffsets.set(row, fromScroll);
+        setOffset(row, fromScroll);
+      }
+    });
+  };
+  galleryNativeScrollMq.addEventListener('change', () => {
+    if (autoscrollRafId) {
+      cancelAnimationFrame(autoscrollRafId);
+      autoscrollRafId = 0;
+    }
+    syncGalleryNativeScrollMode();
+    if (typeof window._startGalleryAutoscroll === 'function') {
+      window._startGalleryAutoscroll();
+    }
+  });
+  if (galleryNativeScrollMq.matches) {
+    syncGalleryNativeScrollMode();
+  }
 
   if (!prefersReducedMotion) {
     const ARROW_PAUSE_MS = 500;
@@ -781,7 +855,6 @@ document.addEventListener('DOMContentLoaded', () => {
       easeInStart = now + ARROW_PAUSE_MS;
     };
 
-    let autoscrollRafId = 0;
     let galleryInView = false;
     const autoscroll = () => {
       autoscrollRafId = 0;
@@ -800,21 +873,25 @@ document.addEventListener('DOMContentLoaded', () => {
       galleryRows.forEach((row, i) => {
         const track = getTrack(row);
         if (!track) return;
-        let speed = (AUTOSCROLL_SPEEDS[i] ?? AUTOSCROLL_SPEEDS[0]) * globalSpeedMultiplier;
+        const speedIndex = row.id === 'galleryRow1' ? 1 : row.id === 'galleryRow0' ? 0 : i;
+        let speed = (AUTOSCROLL_SPEEDS[speedIndex] ?? AUTOSCROLL_SPEEDS[0]) * globalSpeedMultiplier;
         const container = row.closest('.gallery-row-container');
         if (container && hoveredContainers.has(container)) {
           speed *= 0.5;
         }
         const halfWidth = getHalfWidth(row);
-        let next = getOffset(row) + speed;
-        if (next >= halfWidth) next -= halfWidth;
+        const before = getOffset(row);
+        let next = before + speed;
+        while (next >= halfWidth) next -= halfWidth;
         setOffset(row, next);
       });
+
       autoscrollRafId = requestAnimationFrame(autoscroll);
     };
     const startAutoscroll = () => {
       if (!autoscrollRafId) autoscrollRafId = requestAnimationFrame(autoscroll);
     };
+    window._startGalleryAutoscroll = startAutoscroll;
 
     const gallerySection = document.getElementById('gallery');
     if (gallerySection) {
@@ -835,6 +912,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window._pauseGalleryAutoscroll = pauseAutoscroll;
+
+    galleryRows.forEach((row) => {
+      row.addEventListener(
+        'pointerdown',
+        (e) => {
+          if (e.pointerType === 'touch') window._pauseGalleryAutoscroll?.();
+        },
+        { passive: true }
+      );
+    });
 
     if (gallerySection) {
       gallerySection.addEventListener('keydown', (e) => {
