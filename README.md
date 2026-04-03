@@ -72,3 +72,5 @@ This repo includes **`.nojekyll`** so GitHub does not run Jekyll (avoids surpris
 **Project site URL:** Paths in this project are relative (`styles.css`, `images/…`), so they work under `github.io/repo-name/`. For a **user/org site** (`username.github.io`), put these files in that repository’s root and the site will load at `https://username.github.io/`.
 
 **Custom domain (optional):** Add your domain in **Pages** settings and commit a `CNAME` file in the repo root with a single line: your hostname (e.g. `www.example.com`).
+
+**Large files:** GitHub blocks files larger than **100 MB**. This project’s media are below that limit. If you add bigger video or audio assets, compress them, use [Git LFS](https://git-lfs.github.com/), or host media elsewhere and link to it.
