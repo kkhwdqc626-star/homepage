@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <title>Chrisna Lungala — Composer for Film & Visual Media</title>
+  <meta name="description" content="Chrisna Lungala is a self-taught composer based in Munich, creating bespoke and evocative music for film and other visual media.">
+  <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/inter-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="images/headshot.jpg?v=2" as="image">
+  <link rel="preload" href="images/screengrabs/oscars.jpg" as="image">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main" class="skip-link" data-i18n="skipLink">Skip to Content</a>
+
+  <!-- Navigation - Umbrel-style -->
+  <nav class="nav" id="nav">
+    <div class="nav-container">
+      <a href="#" class="nav-logo">Chrisna Lungala</a>
+      <div class="nav-menu">
+        <div class="nav-links">
+          <a href="#gallery" data-i18n="navWork">Work</a>
+          <a href="#work-spotlight" id="about-nav" data-i18n="navAbout">About</a>
+          <a href="#listen" data-i18n="navListen">Listen</a>
+          <a href="#" id="contact-trigger" aria-haspopup="dialog" aria-expanded="false" data-i18n="navContact">Contact</a>
+        </div>
+        <span class="nav-divider" aria-hidden="true"></span>
+        <button type="button" class="nav-lang-toggle" id="lang-toggle" aria-label="Switch to German">GER</button>
+      </div>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main id="main">
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+      <div class="hero-video" id="heroVideo">
+        <video autoplay muted loop playsinline preload="metadata" fetchpriority="high" width="1920" height="1080">
+          <source src="videos/Homepage.m4v" type="video/mp4">
+        </video>
+      </div>
+      <div class="hero-sticky">
+        <div class="hero-content">
+          <div class="hero-slide" data-slide="1">
+            <p class="hero-line hero-line-en" data-lang="en">Chrisna Lungala is a self-taught composer based in Munich, creating <span class="hero-typewriter" id="heroTypewriter"></span><span class="hero-typewriter-cursor" aria-hidden="true">|</span>music for films, TV and games.</p>
+            <p class="hero-line hero-line-de" data-lang="de" style="display:none;">Chrisna Lungala ist ein Komponist aus München, der eindringliche Musik für Filme, Fernsehen und Spiele schreibt.</p>
+            <p class="hero-line hero-line-fr" data-lang="fr" style="display:none;">Chrisna Lungala est un compositeur basé à Munich, qui crée une musique évocatrice pour le cinéma, la télévision et les jeux vidéo.</p>
+          </div>
+        </div>
+      </div>
+      <div class="hero-spacer" aria-hidden="true"></div>
+    </section>
+
+    <script>
+    (function(){
+      var el=document.getElementById('heroTypewriter');
+      if(!el)return;
+      if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent='bespoke';var c=document.querySelector('.hero-typewriter-cursor');if(c)c.style.display='none';return;}
+      var words=['bespoke','evocative','expressive','moving','powerful'];
+      var wi=0,ci=0,del=false;
+      function run(){
+        var w=words[wi];
+        if(del){
+          el.textContent=w.substring(0,ci-1);
+          ci--;
+          if(ci===0){del=false;wi=(wi+1)%words.length;setTimeout(run,500);}
+          else setTimeout(run,50);
+        }else{
+          el.textContent=w.substring(0,ci+1);
+          ci++;
+          if(ci===w.length){del=true;setTimeout(run,2000);}
+          else setTimeout(run,80);
+        }
+      }
+      function start(){setTimeout(run,1600);}
+      if(document.hidden){
+        document.addEventListener('visibilitychange',function onV(){
+          if(!document.hidden){document.removeEventListener('visibilitychange',onV);start();}
+        });
+      }else start();
+    })();
+    </script>
+
+    <!-- Gallery Section - Apple-style carousel -->
+    <section class="section section-gallery" id="gallery">
+      <div class="gallery-container">
+        <div class="gallery-row-container">
+          <button type="button" class="gallery-arrow gallery-arrow-prev" data-row="0" aria-label="Previous item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button type="button" class="gallery-arrow gallery-arrow-next" data-row="0" aria-label="Next item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <div class="gallery-row" id="galleryRow0">
+            <div class="gallery-row-track">
+          <a href="https://www.ardmediathek.de/film/der-talentierte-mr-f/Y3JpZDovL21kci5kZS9zZW5kZXJlaWhlbi8yYjcwOGU3OC04YWNjLTQ4OWEtOThiNy00NmVjNGRhMTQxMzAvcHJvZ3JhbS01MzMxMzYtNTA3ODU5" target="_blank" rel="noopener" class="gallery-item" data-index="0">
+            <span class="gallery-item-badge-new" data-i18n="badgeNew">New</span>
+            <span class="gallery-item-label">
+              <span class="gallery-item-category" data-i18n="catDocumentary">Documentary</span>
+              <span class="gallery-item-title">Der Talentierte Mr. F</span>
+              <span class="gallery-item-award" data-i18n="awardGrimme">Grimme Award® Winner</span>
+            </span>
+            <img src="images/der-talentierte-mr-f.jpg" alt="Der Talentierte Mr. F" width="400" height="225" loading="eager" decoding="async" fetchpriority="high">
+          </a>
+          <a href="https://www.ardmediathek.de/video/kurzfilmnacht/istina-wahrheit/br/Y3JpZDovL2JyLmRlL3ZpZGVvL2I1MGQ2ZGI4LTYzOWMtNDM3Yy1hNmU2LTExZDdhNzlmZmNkYS9icm9hZGNhc3Q" target="_blank" rel="noopener" class="gallery-item" data-index="1">
+            <span class="gallery-item-label">
+              <span class="gallery-item-category" data-i18n="catDrama">Drama</span>
+              <span class="gallery-item-title">ISTINA (Truth)</span>
+              <span class="gallery-item-award" data-i18n="awardStudentOscarWinner">Student Academy Award® Winner</span>
+            </span>
+            <img src="images/istina.jpg" alt="ISTINA (Truth)" width="400" height="225" loading="lazy" decoding="async">
+            <img src="album art/laurels/01 SAA.png" alt="Student Academy Award®" class="gallery-item-laurel" width="56" height="56" loading="lazy">
+          </a>
+          <a href="https://www.ardmediathek.de/video/kurzfilmnacht/mitlaeufer/br/Y3JpZDovL2JyLmRlL2Jyb2FkY2FzdC9kMmMzZTQ4Yy0wODNiLTQ4MDItYTA2NS1hYzY0ZWU1OWM0Y2Zfb25saW5lYnJvYWRjYXN0" target="_blank" rel="noopener" class="gallery-item" data-index="2">
+            <span class="gallery-item-label">
+              <span class="gallery-item-category" data-i18n="catDrama">Drama</span>
+              <span class="gallery-item-title">Those Who Follow</span>
+              <span class="gallery-item-award" data-i18n="awardStudentOscarNominee">Student Academy Award® Nominee</span>
+            </span>
+            <img src="images/mitlaeufer.jpg" alt="Those Who Follow" width="400" height="225" loading="lazy" decoding="async">
+            <img src="album art/laurels/01 SAA.png" alt="Student Academy Award®" class="gallery-item-laurel" width="56" height="56" loading="lazy">
+          </a>
+          <a href="https://milochiavarino.com" target="_blank" rel="noopener" class="gallery-item" data-index="3">
+            <span class="gallery-item-label">
+              <span class="gallery-item-category" data-i18n="catAnimation">Animation</span>
+              <span class="gallery-item-title">ISS – 25th Anniversary</span>
+              <span class="gallery-item-award" data-i18n="awardEmpty"></span>
+            </span>
+            <img src="images/iss-25.jpeg" alt="ISS – 25th Anniversary" width="400" height="225" loading="lazy" decoding="async">
+          </a>
+          <a href="https://www.joyn.de/serien/olaf-scholz-countdown-im-kanzleramt" target="_blank" rel="noopener" class="gallery-item" data-index="4">
+            <span class="gallery-item-label">
+              <span class="gallery-item-category" data-i18n="catDocumentary">Documentary</span>
+              <span class="gallery-item-title">Olaf Scholz – Countdown im Kanzleramt</span>
+              <span class="gallery-item-award" data-i18n="awardEmpty"></span>
+            </span>
+            <img src="images/countdown-kanzleramt.jpg" alt="Countdown im Kanzleramt" width="400" height="225" loading="lazy" decoding="async">
+          </a>
+          <a href="https://mubi.com/en/de/films/get-home-safe" target="_blank" rel="noopener" class="gallery-item" data-index="5">
+            <span class="gallery-item-label">
+              <span class="gallery-item-category" data-i18n="catThriller">Thriller</span>
+              <span class="gallery-item-title">Get Home Safe</span>
+              <span class="gallery-item-award" data-i18n="awardCannesWinner">Cannes Student Award® Winner</span>
+            </span>
+            <img src="images/get-home-safe.jpg" alt="Get Home Safe" width="400" height="225" loading="lazy" decoding="async">
+            <img src="album art/laurels/03 CANNES.png" alt="Cannes Indie Shorts Award" class="gallery-item-laurel" width="56" height="56" loading="lazy">
+          </a>
+          <a href="https://vimeo.com/341757377" target="_blank" rel="noopener" class="gallery-item" data-index="6">
+            <span class="gallery-item-label">
+              <span class="gallery-item-category" data-i18n="catShort">Short</span>
+              <span class="gallery-item-title">Prana</span>
+              <span class="gallery-item-award" data-i18n="awardEmpty"></span>
+            </span>
+            <img src="images/prana.png" alt="Prana" width="400" height="225" loading="lazy" decoding="async">
+          </a>
+            </div>
+          </div>
+        </div>
+        <div class="gallery-row-container">
+          <button type="button" class="gallery-arrow gallery-arrow-prev" data-row="1" aria-label="Previous item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button type="button" class="gallery-arrow gallery-arrow-next" data-row="1" aria-label="Next item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <div class="gallery-row" id="galleryRow1">
+            <div class="gallery-row-track">
+          <a href="https://bitteeinenfilm.com/all-projects/v/flow" target="_blank" rel="noopener" class="gallery-item" data-index="7">
+            <span class="gallery-item-label">
+              <span class="gallery-item-category" data-i18n="catComingOfAge">Coming of Age</span>
+              <span class="gallery-item-title">Flow</span>
+              <span class="gallery-item-award" data-i18n="awardEmpty"></span>
+            </span>
+            <img src="images/flow.jpeg" alt="Flow" width="400" height="225" loading="lazy" decoding="async">
+          </a>
+          <a href="#" class="gallery-item" data-index="8">
+            <span class="gallery-item-label">
+              <span class="gallery-item-category" data-i18n="catVRGame">VR Game</span>
+              <span class="gallery-item-title">Icebreakers</span>
+              <span class="gallery-item-award" data-i18n="awardSonyFinalist">Sony Talent League Finalist</span>
+            </span>
+            <img src="images/vr-game.jpeg" alt="Icebreakers" width="400" height="225" loading="lazy" decoding="async" fetchpriority="low">
+          </a>
+          <a href="#" class="gallery-item" data-index="9">
+            <span class="gallery-item-label">
+              <span class="gallery-item-category" data-i18n="catAdCampaign">Ad Campaign</span>
+              <span class="gallery-item-title">Fritz Kola</span>
+              <span class="gallery-item-award" data-i18n="awardEmpty"></span>
+            </span>
+            <img src="images/fritz-kola.gif" alt="Fritz Kola Ad Campaign" width="400" height="225" loading="lazy" decoding="async" fetchpriority="low">
+          </a>
+          <a href="https://mubi.com/en/de/films/bear-on-ice" target="_blank" rel="noopener" class="gallery-item" data-index="10">
+            <span class="gallery-item-label">
+              <span class="gallery-item-category" data-i18n="catShort">Short</span>
+              <span class="gallery-item-title">Bear on Ice</span>
+              <span class="gallery-item-award" data-i18n="awardEmpty"></span>
+            </span>
+            <img src="images/bear-on-ice.jpeg" alt="Bear on Ice" width="400" height="225" loading="lazy" decoding="async" fetchpriority="low">
+          </a>
+          <a href="https://www.frederickau.com/rubberneck" target="_blank" rel="noopener" class="gallery-item" data-index="11">
+            <span class="gallery-item-label">
+              <span class="gallery-item-category" data-i18n="catShort">Short</span>
+              <span class="gallery-item-title">Rubberneck</span>
+              <span class="gallery-item-award" data-i18n="awardEmpty"></span>
+            </span>
+            <img src="images/rubberneck.jpeg" alt="Rubberneck" width="400" height="225" loading="lazy" decoding="async" fetchpriority="low">
+          </a>
+          <a href="https://www.glassfrogfilms.de/de/commercials/projects/lebensschulden" target="_blank" rel="noopener" class="gallery-item" data-index="12">
+            <span class="gallery-item-label">
+              <span class="gallery-item-category" data-i18n="catShort">Short</span>
+              <span class="gallery-item-title">Lebensschulden</span>
+              <span class="gallery-item-award" data-i18n="awardEmpty"></span>
+            </span>
+            <img src="images/lebensschulden.jpg" alt="Lebensschulden" width="400" height="225" loading="lazy" decoding="async" fetchpriority="low">
+          </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Work spotlight — tabbed gallery (Apple Education “Apps for whatever you’re into” pattern) -->
+    <section class="section section-apps-gallery" id="work-spotlight">
+      <div class="apps-gallery-scroller-wrap">
+        <div class="apps-gallery-scroller" id="apps-gallery-scroller" tabindex="0" role="region" aria-roledescription="carousel" data-i18n-aria="galleryCarouselAria">
+          <div class="apps-gallery-panel is-active" id="apps-gallery-panel-0" role="tabpanel" aria-labelledby="apps-gallery-tab-0" data-panel-index="0">
+            <div class="apps-gallery-panel-card">
+              <a href="#" class="apps-gallery-panel-media-link" id="contact-gallery-link" data-open-contact-sheet>
+                <div class="apps-gallery-image-wrap apps-gallery-image-wrap--headshot">
+                  <img src="images/headshot.jpg?v=2" alt="" width="800" height="800" loading="eager" decoding="async" fetchpriority="high" data-i18n-alt="galleryAlt0">
+                </div>
+              </a>
+              <div class="apps-gallery-caption">
+                <span class="apps-gallery-caption-kicker" data-i18n="galleryCapKicker0">Composer</span>
+                <span class="apps-gallery-caption-title">Chrisna Lungala</span>
+                <span class="apps-gallery-caption-award" data-i18n="awardGermanFilmmusicYoungTalent">German Filmmusic Award Winner (Young Talent)</span>
+              </div>
+            </div>
+          </div>
+          <div class="apps-gallery-panel" id="apps-gallery-panel-1" role="tabpanel" aria-labelledby="apps-gallery-tab-1" data-panel-index="1">
+            <div class="apps-gallery-panel-card">
+              <a href="https://www.ardmediathek.de/film/der-talentierte-mr-f/Y3JpZDovL21kci5kZS9zZW5kZXJlaWhlbi8yYjcwOGU3OC04YWNjLTQ4OWEtOThiNy00NmVjNGRhMTQxMzAvcHJvZ3JhbS01MzMxMzYtNTA3ODU5" target="_blank" rel="noopener noreferrer" class="apps-gallery-panel-media-link">
+                <div class="apps-gallery-image-wrap">
+                  <span class="gallery-item-badge-new" data-i18n="badgeNew">New</span>
+                  <img src="images/screengrabs/der_talentierte_mr_f.jpg" alt="" width="1200" height="675" loading="lazy" decoding="async" data-i18n-alt="galleryAlt1">
+                </div>
+              </a>
+              <div class="apps-gallery-caption">
+                <span class="apps-gallery-caption-kicker" data-i18n="galleryCapKicker1">Documentary</span>
+                <span class="apps-gallery-caption-title">Der Talentierte Mr. F</span>
+                <span class="apps-gallery-caption-award" data-i18n="awardGrimme">Grimme Award® Winner</span>
+              </div>
+            </div>
+          </div>
+          <div class="apps-gallery-panel" id="apps-gallery-panel-2" role="tabpanel" aria-labelledby="apps-gallery-tab-2" data-panel-index="2">
+            <div class="apps-gallery-panel-card">
+              <a href="https://www.ardmediathek.de/video/kurzfilmnacht/istina-wahrheit/br/Y3JpZDovL2JyLmRlL3ZpZGVvL2I1MGQ2ZGI4LTYzOWMtNDM3Yy1hNmU2LTExZDdhNzlmZmNkYS9icm9hZGNhc3Q" target="_blank" rel="noopener noreferrer" class="apps-gallery-panel-media-link">
+                <div class="apps-gallery-image-wrap">
+                  <img src="images/screengrabs/istina.jpg" alt="" width="1200" height="675" loading="lazy" decoding="async" data-i18n-alt="galleryAlt2">
+                </div>
+              </a>
+              <div class="apps-gallery-caption">
+                <span class="apps-gallery-caption-kicker" data-i18n="galleryCapKicker2">Drama</span>
+                <span class="apps-gallery-caption-title">ISTINA (Truth)</span>
+                <span class="apps-gallery-caption-award" data-i18n="awardStudentOscarWinner">Student Academy Award® Winner</span>
+              </div>
+            </div>
+          </div>
+          <div class="apps-gallery-panel" id="apps-gallery-panel-3" role="tabpanel" aria-labelledby="apps-gallery-tab-3" data-panel-index="3">
+            <div class="apps-gallery-panel-card">
+              <a href="https://www.extrememusic.com/search?isAiSearch=false&amp;isLyricsSearch=false&amp;query=Chrisna%20Mikiele%20Lungala" target="_blank" rel="noopener noreferrer" class="apps-gallery-panel-media-link">
+                <div class="apps-gallery-image-wrap apps-gallery-image-wrap--contain">
+                  <img src="images/screengrabs/bleeding_fingers_music.png" alt="" width="1323" height="419" loading="lazy" decoding="async" data-i18n-alt="galleryAlt3">
+                </div>
+              </a>
+              <div class="apps-gallery-caption">
+                <span class="apps-gallery-caption-kicker" data-i18n="galleryCapKicker3">Production Music</span>
+                <span class="apps-gallery-caption-title">Bleeding Fingers Music</span>
+                <span class="apps-gallery-caption-award" data-i18n="awardFreelanceComposer">Freelance Composer</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="apps-gallery-inner">
+        <div class="apps-gallery-tabs-shell">
+          <div class="apps-gallery-tabs" role="tablist" aria-orientation="horizontal" data-i18n-aria="galleryTablistAria">
+            <button type="button" class="apps-gallery-tab is-active" role="tab" id="apps-gallery-tab-0" aria-selected="true" aria-controls="apps-gallery-panel-0" data-i18n="galleryTab0">About Me</button>
+            <button type="button" class="apps-gallery-tab" role="tab" id="apps-gallery-tab-1" aria-selected="false" aria-controls="apps-gallery-panel-1" tabindex="-1" data-i18n="galleryTab1">Der Talentierte Mr. F</button>
+            <button type="button" class="apps-gallery-tab" role="tab" id="apps-gallery-tab-2" aria-selected="false" aria-controls="apps-gallery-panel-2" tabindex="-1" data-i18n="galleryTab2">ISTINA (Truth)</button>
+            <button type="button" class="apps-gallery-tab" role="tab" id="apps-gallery-tab-3" aria-selected="false" aria-controls="apps-gallery-panel-3" tabindex="-1" data-i18n="galleryTab3">Bleeding Fingers Music</button>
+          </div>
+        </div>
+        <div class="apps-gallery-desc-shell">
+          <p class="apps-gallery-desc-text is-active" data-panel-desc="0" data-i18n="gallerySpotDesc0" aria-hidden="false"></p>
+          <p class="apps-gallery-desc-text" data-panel-desc="1" data-i18n="gallerySpotDesc1" aria-hidden="true"></p>
+          <p class="apps-gallery-desc-text" data-panel-desc="2" data-i18n="gallerySpotDesc2" aria-hidden="true"></p>
+          <p class="apps-gallery-desc-text" data-panel-desc="3" data-i18n="gallerySpotDesc3" aria-hidden="true"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Listen Section -->
+    <section class="section section-listen" id="listen">
+      <h2 class="section-title" data-i18n="listen">Listen</h2>
+      <div class="about-demos">
+        <div class="demo-track" data-src="audio/Voices of the Earth.m4a">
+          <button type="button" class="demo-play" aria-label="Play">
+            <svg class="demo-play-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="demo-pause-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <div class="demo-info">
+            <span class="demo-title">Voices of the Earth</span>
+            <div class="demo-progress-wrap">
+              <div class="demo-progress-bar" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div class="demo-progress-fill"></div>
+              </div>
+              <div class="demo-times">
+                <span class="demo-time demo-time-current" aria-live="polite">0:00</span>
+                <span class="demo-time demo-time-total">0:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-track" data-src="audio/Sports Theme.m4a">
+          <button type="button" class="demo-play" aria-label="Play">
+            <svg class="demo-play-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="demo-pause-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <div class="demo-info">
+            <span class="demo-title">Sports Theme</span>
+            <div class="demo-progress-wrap">
+              <div class="demo-progress-bar" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div class="demo-progress-fill"></div>
+              </div>
+              <div class="demo-times">
+                <span class="demo-time demo-time-current" aria-live="polite">0:00</span>
+                <span class="demo-time demo-time-total">0:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-track" data-src="audio/Vandal Rebels (Bleeding Fingers Music).m4a">
+          <button type="button" class="demo-play" aria-label="Play">
+            <svg class="demo-play-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="demo-pause-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <div class="demo-info">
+            <span class="demo-title">Vandal Rebels (Bleeding Fingers Music)</span>
+            <div class="demo-progress-wrap">
+              <div class="demo-progress-bar" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div class="demo-progress-fill"></div>
+              </div>
+              <div class="demo-times">
+                <span class="demo-time demo-time-current" aria-live="polite">0:00</span>
+                <span class="demo-time demo-time-total">0:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-track" data-src="audio/Those Who Follow (from Those Who Follow- Original Score).m4a">
+          <button type="button" class="demo-play" aria-label="Play">
+            <svg class="demo-play-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="demo-pause-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <div class="demo-info">
+            <span class="demo-title">Those Who Follow (from "Those Who Follow" – Original Score)</span>
+            <div class="demo-progress-wrap">
+              <div class="demo-progress-bar" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div class="demo-progress-fill"></div>
+              </div>
+              <div class="demo-times">
+                <span class="demo-time demo-time-current" aria-live="polite">0:00</span>
+                <span class="demo-time demo-time-total">0:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-track" data-src="audio/Disappear (feat. Emily Drum).m4a">
+          <button type="button" class="demo-play" aria-label="Play">
+            <svg class="demo-play-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="demo-pause-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <div class="demo-info">
+            <span class="demo-title">Disappear (feat. Emily Drum)</span>
+            <div class="demo-progress-wrap">
+              <div class="demo-progress-bar" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div class="demo-progress-fill"></div>
+              </div>
+              <div class="demo-times">
+                <span class="demo-time demo-time-current" aria-live="polite">0:00</span>
+                <span class="demo-time demo-time-total">0:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="listen-pill-wrap">
+        <a href="https://play.reelcrafter.com/TZlmAAmJQa2n3CMAsu3lPw" target="_blank" rel="noopener noreferrer" class="floating-pill floating-pill--static" id="listen-pill" data-i18n-aria="listenPillAria">
+          <span class="floating-pill-text" data-i18n="listenPill">Listen to more</span>
+          <span class="floating-pill-btn" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <span class="footer-copyright" data-i18n="copyright">Copyright © 2026 Chrisna Lungala. All rights reserved.</span>
+      <span class="footer-sep"> | </span>
+      <a href="https://music.apple.com/de/artist/chrisna-lungala/1434342396?l=en-GB" target="_blank" rel="noopener" aria-label="Apple Music">Apple Music</a>
+      <span class="footer-sep"> | </span>
+      <a href="https://open.spotify.com/artist/2yG40uMgu2Bpz9KgtkCpSf?si=1TLcmrvSQWO6ZbAb3W2e4A" target="_blank" rel="noopener" aria-label="Spotify">Spotify</a>
+      <span class="footer-sep"> | </span>
+      <a href="https://www.instagram.com/chrisnalungala/" target="_blank" rel="noopener" aria-label="Instagram">Instagram</a>
+      <span class="footer-sep"> | </span>
+      <a href="https://www.linkedin.com/in/chrisna-lungala/" target="_blank" rel="noopener" aria-label="LinkedIn">LinkedIn</a>
+      <span class="footer-sep"> | </span>
+      <a href="https://www.imdb.com/name/nm8779128/" target="_blank" rel="noopener" aria-label="IMDb">IMDb</a>
+      <span class="footer-sep"> | </span>
+      <a href="legal.html" data-i18n="legal">Legal</a>
+      <span class="footer-sep"> | </span>
+      <a href="privacy.html" data-i18n="privacy">Privacy</a>
+      <span class="footer-sep"> | </span>
+      <span class="footer-location" data-i18n="germany">Germany</span>
+    </div>
+  </footer>
+
+  <!-- Contact sheet (bottom sheet) -->
+  <div class="sheet-overlay" id="contact-sheet" aria-hidden="true" role="dialog" aria-labelledby="contact-sheet-heading" aria-modal="true">
+    <div class="sheet-backdrop"></div>
+    <div class="sheet-panel sheet-panel--contact">
+      <button type="button" class="sheet-close" data-i18n-aria="sheetClose" aria-label="Close">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="sheet-content sheet-content--contact">
+        <div class="contact-sheet-grid">
+          <div class="contact-sheet-copy">
+            <p class="contact-sheet-lead" id="contact-sheet-heading" data-i18n="contactSubtitle">For inquiries regarding collaborations, commissions, educational or speaker proposals, please feel free to reach out.</p>
+            <a href="mailto:c.lungala@icloud.com" class="contact-sheet-cta" data-i18n="contactCtaBtn">Get in touch</a>
+            <nav class="contact-sheet-social" data-i18n-aria="contactSocialNavAria" aria-label="Streaming and social links">
+              <a href="https://music.apple.com/de/artist/chrisna-lungala/1434342396?l=en-GB" class="contact-sheet-social-link" target="_blank" rel="noopener noreferrer" data-i18n-aria="contactAriaAppleMusic" aria-label="Apple Music">
+                <img src="images/icons/social/applemusic.svg" alt="" width="22" height="22" class="contact-sheet-social-img" decoding="async">
+              </a>
+              <a href="https://open.spotify.com/artist/2yG40uMgu2Bpz9KgtkCpSf?si=1TLcmrvSQWO6ZbAb3W2e4A" class="contact-sheet-social-link" target="_blank" rel="noopener noreferrer" data-i18n-aria="contactAriaSpotify" aria-label="Spotify">
+                <img src="images/icons/social/spotify.svg" alt="" width="22" height="22" class="contact-sheet-social-img" decoding="async">
+              </a>
+              <a href="https://www.instagram.com/chrisnalungala/" class="contact-sheet-social-link" target="_blank" rel="noopener noreferrer" data-i18n-aria="contactAriaInstagram" aria-label="Instagram">
+                <img src="images/icons/social/instagram.svg" alt="" width="22" height="22" class="contact-sheet-social-img" decoding="async">
+              </a>
+              <a href="https://www.linkedin.com/in/chrisna-lungala/" class="contact-sheet-social-link" target="_blank" rel="noopener noreferrer" data-i18n-aria="contactAriaLinkedIn" aria-label="LinkedIn">
+                <img src="images/icons/social/linkedin.svg" alt="" width="22" height="22" class="contact-sheet-social-img" decoding="async">
+              </a>
+              <a href="https://www.imdb.com/name/nm8779128/" class="contact-sheet-social-link" target="_blank" rel="noopener noreferrer" data-i18n-aria="contactAriaIMDb" aria-label="IMDb">
+                <img src="images/icons/social/imdb.svg" alt="" width="22" height="22" class="contact-sheet-social-img" decoding="async">
+              </a>
+            </nav>
+          </div>
+          <div class="contact-sheet-media">
+            <img
+              src="images/screengrabs/oscars.jpg"
+              alt=""
+              width="1536"
+              height="2049"
+              loading="eager"
+              decoding="async"
+              fetchpriority="low"
+              data-i18n-alt="contactOscarsAlt"
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
