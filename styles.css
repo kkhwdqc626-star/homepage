@@ -94,10 +94,15 @@
   --font-size-meta: clamp(13px, 0.2rem + 2.5vw, 14px);
   --font-size-heading-sm: clamp(19px, 2.8vw, 24px);
   
-  /* Transitions */
-  --transition-fast: 0.2s ease;
-  --transition-smooth: 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-  --transition-slow: 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+  /* Motion — quick response, smooth deceleration (GPU-friendly: prefer transform/opacity) */
+  --ease-out-snappy: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out-standard: cubic-bezier(0.33, 1, 0.68, 1);
+  --transition-fast: 0.15s var(--ease-out-snappy);
+  --transition-smooth: 0.2s var(--ease-out-snappy);
+  --transition-slow: 0.35s var(--ease-out-standard);
+
+  /* Touch — iOS HIG / Material minimum tap target */
+  --touch-target-min: 44px;
 }
 
 /* Reset & Base */
@@ -143,7 +148,15 @@ body {
   overflow-x: clip;
 }
 
-button, a, [role="button"] {
+button,
+a,
+[role="button"],
+[role="slider"],
+[role="tab"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+label[for] {
   touch-action: manipulation;
 }
 
@@ -343,7 +356,9 @@ button, a, [role="button"] {
     0 8px 32px rgba(0, 0, 0, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.15),
     inset 0 -1px 0 rgba(255, 255, 255, 0.05);
-  transition: background 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
   overflow: hidden;
 }
 
@@ -480,8 +495,8 @@ button, a, [role="button"] {
   transform-origin: center;
   /* Same duration + easing on transform and opacity so close mirrors open (true reverse). */
   transition:
-    transform 0.38s cubic-bezier(0.25, 0.1, 0.25, 1),
-    opacity 0.38s cubic-bezier(0.25, 0.1, 0.25, 1);
+    transform 0.26s var(--ease-out-snappy),
+    opacity 0.26s var(--ease-out-snappy);
 }
 
 .nav-toggle span:nth-child(1),
@@ -496,6 +511,7 @@ button, a, [role="button"] {
 
 .nav-toggle,
 .nav-lang-toggle,
+.nav-logo,
 .nav-links a,
 .gallery-arrow,
 .gallery-item,
@@ -504,7 +520,12 @@ button, a, [role="button"] {
 .apps-gallery-caption,
 .apps-gallery-panel-card,
 .floating-pill,
-.demo-play {
+.demo-play,
+.demo-progress-bar,
+.demo-track,
+.accordion-header,
+.sheet-close,
+.contact-sheet-social-link {
   touch-action: manipulation;
 }
 
@@ -527,7 +548,7 @@ button, a, [role="button"] {
   bottom: 0;
   z-index: 0;
   opacity: 1;
-  transition: opacity 0.4s ease-out;
+  transition: opacity 0.28s var(--ease-out-standard);
   pointer-events: none;
   contain: layout paint;
 }
@@ -574,7 +595,7 @@ button, a, [role="button"] {
   width: 100%;
   padding: 0 calc((var(--spacing-md) + var(--spacing-lg)) * 4);
   opacity: 0;
-  transition: opacity 0.6s ease-out;
+  transition: opacity 0.4s var(--ease-out-standard);
   pointer-events: none;
   will-change: opacity;
 }
@@ -675,7 +696,11 @@ button, a, [role="button"] {
   letter-spacing: -0.022em;
   color: #ffffff;
   opacity: 1;
-  transition: opacity 0.35s ease, background 0.25s ease, transform 0.35s cubic-bezier(0.34, 1.2, 0.64, 1), box-shadow 0.25s ease;
+  transition:
+    opacity var(--transition-smooth),
+    background var(--transition-fast),
+    transform 0.22s var(--ease-out-standard),
+    box-shadow var(--transition-fast);
   overflow: hidden;
 }
 
@@ -727,11 +752,13 @@ button, a, [role="button"] {
   align-items: center;
   justify-content: center;
   color: #ffffff;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-fast);
 }
 
 .floating-pill-btn svg {
-  transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: transform var(--transition-smooth);
 }
 
 .floating-pill:hover .floating-pill-btn {
@@ -775,7 +802,10 @@ button, a, [role="button"] {
   min-height: 48px;
   border-radius: 980px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.28);
-  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .hero-cta-btn:hover {
@@ -941,6 +971,7 @@ button, a, [role="button"] {
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  min-height: var(--touch-target-min);
   padding: var(--spacing-md) 0;
   background: none;
   border: none;
@@ -950,7 +981,7 @@ button, a, [role="button"] {
   text-align: left;
   cursor: pointer;
   font-family: inherit;
-  transition: opacity 0.2s ease;
+  transition: opacity var(--transition-fast);
 }
 
 .accordion-header:hover {
@@ -960,7 +991,7 @@ button, a, [role="button"] {
 .accordion-icon {
   flex-shrink: 0;
   margin-left: var(--spacing-md);
-  transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: transform var(--transition-smooth);
 }
 
 .accordion-item[data-expanded="true"] .accordion-icon {
@@ -970,7 +1001,7 @@ button, a, [role="button"] {
 .accordion-content {
   overflow: hidden;
   max-height: 0;
-  transition: max-height 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: max-height 0.28s var(--ease-out-snappy);
 }
 
 .accordion-item[data-expanded="true"] .accordion-content {
@@ -1024,7 +1055,10 @@ button, a, [role="button"] {
   justify-content: center;
   z-index: 2;
   opacity: 0;
-  transition: background 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    background var(--transition-fast),
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
 }
 
 .gallery-row-container:hover .gallery-arrow {
@@ -1418,10 +1452,10 @@ button, a, [role="button"] {
   white-space: nowrap;
   flex-shrink: 0;
   transition:
-    background 0.28s cubic-bezier(0.25, 0.1, 0.25, 1),
-    color 0.28s cubic-bezier(0.25, 0.1, 0.25, 1),
-    box-shadow 0.28s cubic-bezier(0.25, 0.1, 0.25, 1),
-    transform 0.2s ease;
+    background var(--transition-smooth),
+    color var(--transition-smooth),
+    box-shadow var(--transition-smooth),
+    transform var(--transition-fast);
 }
 
 .apps-gallery-tab:hover {
@@ -1461,6 +1495,11 @@ button, a, [role="button"] {
 
   .apps-gallery-tab {
     border-radius: 980px;
+    min-height: var(--touch-target-min);
+    padding: 10px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
@@ -1526,7 +1565,7 @@ button, a, [role="button"] {
   scroll-snap-align: center;
   scroll-snap-stop: always;
   opacity: 0.4;
-  transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.45s var(--ease-out-standard);
 }
 
 .apps-gallery-panel.is-active {
@@ -1547,7 +1586,9 @@ button, a, [role="button"] {
   box-shadow:
     0 16px 48px rgba(0, 0, 0, 0.4),
     0 0 0 1px rgba(255, 255, 255, 0.06);
-  transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition:
+    transform var(--transition-smooth),
+    box-shadow var(--transition-smooth);
 }
 
 .apps-gallery-panel-card:hover {
@@ -1667,7 +1708,7 @@ button, a, [role="button"] {
   opacity: 0;
   z-index: 0;
   pointer-events: none;
-  transition: opacity 0.45s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: opacity 0.3s var(--ease-out-standard);
 }
 
 .apps-gallery-desc-text.is-active {
@@ -1703,7 +1744,9 @@ button, a, [role="button"] {
   justify-content: center;
   line-height: 0;
   opacity: 0.92;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
 }
 
 .listen-apple-music-link:hover {
@@ -1768,7 +1811,9 @@ button, a, [role="button"] {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
 .demo-track:hover {
@@ -1778,8 +1823,8 @@ button, a, [role="button"] {
 
 .demo-play {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
   border-radius: 50%;
   background: #0071e3;
   border: none;
@@ -1788,7 +1833,9 @@ button, a, [role="button"] {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-fast);
 }
 
 .demo-play:hover {
@@ -1854,11 +1901,12 @@ button, a, [role="button"] {
   flex-shrink: 0;
 }
 
+/* Tall hit area (44px) for touch; 5px track drawn with ::before */
 .demo-progress-bar {
   width: 100%;
-  height: 5px;
-  min-height: 5px;
-  background: rgba(255, 255, 255, 0.25);
+  min-height: var(--touch-target-min);
+  padding: 0;
+  background: transparent;
   border-radius: 999px;
   cursor: pointer;
   overflow: hidden;
@@ -1866,28 +1914,48 @@ button, a, [role="button"] {
   flex-shrink: 0;
 }
 
-.demo-progress-bar:hover {
+.demo-progress-bar::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 5px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.demo-progress-bar:hover::before {
   background: rgba(255, 255, 255, 0.35);
 }
 
 .demo-progress-fill {
-  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 5px;
   width: 0%;
   min-width: 0;
   background: #fff;
   border-radius: 999px;
-  transition: width 0.1s linear;
+  transition: width 0.08s linear;
   flex-shrink: 0;
+  z-index: 1;
+  pointer-events: none;
 }
 
 /* Bottom sheet overlay (Contact) */
 .sheet-overlay {
-  --sheet-blur-ramp: 0.75s;
-  --sheet-blur-dismiss: 0.48s;
-  --sheet-blur-ease: cubic-bezier(0.33, 1, 0.68, 1);
-  --sheet-panel-pop: 0.42s;
-  --sheet-panel-dismiss: 0.32s;
-  --sheet-panel-ease: cubic-bezier(0.32, 0.72, 0.29, 1);
+  --sheet-blur-ramp: 0.48s;
+  --sheet-blur-dismiss: 0.32s;
+  --sheet-blur-ease: var(--ease-out-standard);
+  --sheet-panel-pop: 0.32s;
+  --sheet-panel-dismiss: 0.24s;
+  --sheet-panel-ease: var(--ease-out-snappy);
   --sheet-panel-dismiss-ease: cubic-bezier(0.4, 0, 1, 1);
   position: fixed;
   inset: 0;
@@ -2018,8 +2086,10 @@ button, a, [role="button"] {
   position: absolute;
   top: clamp(var(--spacing-sm), 2vw, var(--spacing-md));
   right: clamp(var(--spacing-sm), 2vw, var(--spacing-md));
-  width: clamp(32px, 8vw, 40px);
-  height: clamp(32px, 8vw, 40px);
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.15);
   background: rgba(255, 255, 255, 0.08);
@@ -2403,10 +2473,10 @@ button, a, [role="button"] {
     backdrop-filter: blur(0px);
     -webkit-backdrop-filter: blur(0px);
     transition:
-      opacity 0.4s cubic-bezier(0.25, 0.1, 0.25, 1),
-      background 0.4s cubic-bezier(0.25, 0.1, 0.25, 1),
-      backdrop-filter 0.45s cubic-bezier(0.25, 0.1, 0.25, 1),
-      -webkit-backdrop-filter 0.45s cubic-bezier(0.25, 0.1, 0.25, 1);
+      opacity 0.28s var(--ease-out-standard),
+      background 0.28s var(--ease-out-standard),
+      backdrop-filter 0.32s var(--ease-out-standard),
+      -webkit-backdrop-filter 0.32s var(--ease-out-standard);
   }
 
   .nav.open .nav-mobile-backdrop {
@@ -2470,9 +2540,9 @@ button, a, [role="button"] {
     pointer-events: none;
     transform: scale(0.97) translateY(-6px);
     transition:
-      opacity 0.32s cubic-bezier(0.25, 0.1, 0.25, 1),
-      transform 0.32s cubic-bezier(0.25, 0.1, 0.25, 1),
-      visibility 0s linear 0.32s;
+      opacity 0.24s var(--ease-out-snappy),
+      transform 0.24s var(--ease-out-snappy),
+      visibility 0s linear 0.24s;
   }
 
   .nav.open .nav-links {
@@ -2481,8 +2551,8 @@ button, a, [role="button"] {
     pointer-events: auto;
     transform: scale(1) translateY(0);
     transition:
-      opacity 0.36s cubic-bezier(0.25, 0.1, 0.25, 1),
-      transform 0.36s cubic-bezier(0.25, 0.1, 0.25, 1),
+      opacity 0.26s var(--ease-out-snappy),
+      transform 0.26s var(--ease-out-snappy),
       visibility 0s;
   }
 
@@ -2667,19 +2737,13 @@ button, a, [role="button"] {
 
   .apps-gallery-tab {
     flex-shrink: 0;
-    min-height: 44px;
+    min-height: var(--touch-target-min);
     padding: 8px 10px;
   }
 
-  /* Floating pill inner button – 44px on mobile */
+  /* Floating pill inner button — touch target */
   .floating-pill-btn {
-    width: 44px;
-    height: 44px;
-  }
-
-  /* Demo play button – 44px touch target */
-  .demo-play {
-    width: 44px;
-    height: 44px;
+    width: var(--touch-target-min);
+    height: var(--touch-target-min);
   }
 }

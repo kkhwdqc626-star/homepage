@@ -941,7 +941,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  const ARROW_ANIMATE_MS = 350;
+  const ARROW_ANIMATE_MS = 280;
   const easeOutCubic = (t) => 1 - (1 - t) ** 3;
 
   const animateToOffset = (row, targetOffset) => {
@@ -1005,9 +1005,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let appsGalleryJumpToken = 0;
     let appsGalleryPickerSyncToken = 0;
 
-    /** Apple-like: long ease-out so the carousel coasts into place (not the browser’s short smooth scroll). */
-    const APPS_GALLERY_SCROLL_MS = 840;
-    const APPS_GALLERY_TAB_SCROLL_MS = 560;
+    /** Ease-out scroll so the carousel coasts into place (not the browser’s short smooth scroll). */
+    const APPS_GALLERY_SCROLL_MS = 640;
+    const APPS_GALLERY_TAB_SCROLL_MS = 420;
     const easeOutQuint = (t) => 1 - (1 - t) ** 5;
 
     const animateScrollLeft = (el, targetLeft, durationMs, isCancelled) => {
@@ -1181,7 +1181,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ignoreScrollSync = false;
       };
       scrollToPanel(index, endIgnore);
-      window.setTimeout(endIgnore, prefersReducedMotionApps ? 200 : APPS_GALLERY_SCROLL_MS + 180);
+      window.setTimeout(endIgnore, prefersReducedMotionApps ? 200 : APPS_GALLERY_SCROLL_MS + 120);
     };
 
     panels.forEach((panel, i) => {
