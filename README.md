@@ -54,17 +54,31 @@ The site is static HTML/CSS/JS. Deploy to any static host:
 
 This repo includes **`.nojekyll`** so GitHub does not run Jekyll (avoids surprises with static assets).
 
+**Pushing updates (this repo already has Git history):** from the `chrisna-website` folder, stage moves and new files, commit, then push:
+
+```bash
+git add -A
+git status   # optional: review changes
+git commit -m "Describe your changes"
+git push -u origin main
+```
+
+Use **`git add -A`** (not only `git add .`) after moving or renaming folders so deletions and new paths are both recorded.
+
+**First-time upload to a new empty GitHub repository:**
+
 1. Create a new repository on GitHub (empty, no README if you are pushing an existing folder).
-2. From this folder (`chrisna-website`), add the remote and push:
+2. From this folder (`chrisna-website`), connect the remote and push:
 
    ```bash
-   git init
    git branch -M main
-   git add .
-   git commit -m "Initial site"
+   git add -A
+   git commit -m "Initial site"   # skip if you already have commits
    git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
    git push -u origin main
    ```
+
+   Only run **`git init`** if this directory is not already a Git repository.
 
 3. On GitHub: **Settings → Pages → Build and deployment → Source**: choose **Deploy from a branch**, branch **main**, folder **`/ (root)`**.
 4. After a minute, the site will be at **`https://YOUR_USERNAME.github.io/YOUR_REPO/`** (unless you use a custom domain or a `username.github.io` repo).

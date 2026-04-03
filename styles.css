@@ -112,9 +112,8 @@ html {
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0.08);
   }
-  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.08);
-  tap-highlight-color: rgba(255, 255, 255, 0.08);
 }
 
 body {
@@ -174,10 +173,154 @@ button, a, [role="button"] {
   z-index: 9999;
   display: flex;
   justify-content: center;
+  isolation: isolate;
+  /* Full fixed nav band height: safe area + padding + pill (~48px) + bottom padding */
+  --nav-scrim-height: calc(env(safe-area-inset-top, 0px) + 12px + 48px + 12px);
+  /* Extra pixels above the viewport so Safari rubber-band / overscroll doesn’t show bare #000 behind the blur */
+  --nav-scrim-overscroll-y: 120px;
+}
+
+/*
+ * Top scrim: extreme blur at the top (dual backdrop layers) so lines behind the bar aren’t readable;
+ * contrast() softens edges; mask feathers to the bottom with no seam.
+ * brightness(0.75) on ::before only.
+ */
+.nav::before {
+  content: '';
+  position: fixed;
+  top: calc(-1 * var(--nav-scrim-overscroll-y));
+  left: 0;
+  right: 0;
+  height: calc(var(--nav-scrim-height) + var(--nav-scrim-overscroll-y));
+  z-index: 0;
+  pointer-events: none;
+  transform: translateZ(0);
+  filter: brightness(0.75) contrast(0.92);
+  backdrop-filter: blur(140px) saturate(200%) contrast(0.82);
+  -webkit-backdrop-filter: blur(140px) saturate(200%) contrast(0.82);
+  /* Stops remapped: same physical fade as before overscroll extension (see --nav-scrim-overscroll-y). */
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) calc(var(--nav-scrim-overscroll-y) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.97) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.1) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.9) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.22) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.75) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.38) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.55) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.52) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.32) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.68) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.14) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.84) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.04) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.94) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0) 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) calc(var(--nav-scrim-overscroll-y) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.97) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.1) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.9) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.22) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.75) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.38) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.55) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.52) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.32) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.68) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.14) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.84) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.04) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.94) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0) 100%
+  );
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+}
+
+/* Second pass: extra blur in the upper band only (stacks visually for a harsher top smear). */
+.nav::after {
+  content: '';
+  position: fixed;
+  top: calc(-1 * var(--nav-scrim-overscroll-y));
+  left: 0;
+  right: 0;
+  height: calc(var(--nav-scrim-height) + var(--nav-scrim-overscroll-y));
+  z-index: 0;
+  pointer-events: none;
+  transform: translateZ(0);
+  backdrop-filter: blur(72px) saturate(180%) contrast(0.88);
+  -webkit-backdrop-filter: blur(72px) saturate(180%) contrast(0.88);
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) calc(var(--nav-scrim-overscroll-y) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.88) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.18) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.45) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.36) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.5) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%)
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) calc(var(--nav-scrim-overscroll-y) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.88) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.18) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0.45) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.36) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+    rgba(0, 0, 0, 0) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.5) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%)
+  );
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .nav::before {
+    filter: brightness(0.75) contrast(0.95);
+    backdrop-filter: blur(48px) saturate(170%) contrast(0.9);
+    -webkit-backdrop-filter: blur(48px) saturate(170%) contrast(0.9);
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.92) 0%,
+      rgba(0, 0, 0, 0.92) calc(var(--nav-scrim-overscroll-y) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+      rgba(0, 0, 0, 0.78) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.22) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+      rgba(0, 0, 0, 0.52) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.48) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+      rgba(0, 0, 0, 0.26) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.72) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+      rgba(0, 0, 0, 0.08) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.9) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+      rgba(0, 0, 0, 0) 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.92) 0%,
+      rgba(0, 0, 0, 0.92) calc(var(--nav-scrim-overscroll-y) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+      rgba(0, 0, 0, 0.78) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.22) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+      rgba(0, 0, 0, 0.52) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.48) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+      rgba(0, 0, 0, 0.26) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.72) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+      rgba(0, 0, 0, 0.08) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.9) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+      rgba(0, 0, 0, 0) 100%
+    );
+  }
+
+  .nav::after {
+    backdrop-filter: blur(24px) saturate(160%) contrast(0.92);
+    -webkit-backdrop-filter: blur(24px) saturate(160%) contrast(0.92);
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.85) 0%,
+      rgba(0, 0, 0, 0.85) calc(var(--nav-scrim-overscroll-y) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+      rgba(0, 0, 0, 0.4) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.28) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+      rgba(0, 0, 0, 0) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.42) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%)
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.85) 0%,
+      rgba(0, 0, 0, 0.85) calc(var(--nav-scrim-overscroll-y) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+      rgba(0, 0, 0, 0.4) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.28) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%),
+      rgba(0, 0, 0, 0) calc((var(--nav-scrim-overscroll-y) + var(--nav-scrim-height) * 0.42) / (var(--nav-scrim-height) + var(--nav-scrim-overscroll-y)) * 100%)
+    );
+  }
+}
+
+/* Mobile-only overlay; without a base rule the <button> is visible on wide viewports (UA border / sliver). */
+.nav-mobile-backdrop {
+  display: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .nav-container {
   position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -222,9 +365,18 @@ button, a, [role="button"] {
 }
 
 .nav-logo,
-.nav-menu {
+.nav-menu,
+.nav-end {
   position: relative;
   z-index: 1;
+}
+
+/* Right cluster: links + divider + lang on wide screens; lang + divider + hamburger on narrow */
+.nav-end {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-width: 0;
 }
 
 .nav-logo {
@@ -265,11 +417,25 @@ button, a, [role="button"] {
   color: #ffffff;
 }
 
-.nav-divider {
+/* Icons only in the mobile sheet (wide nav stays text-only) */
+.nav-link-icon {
+  display: none;
+}
+
+.nav-divider--desktop,
+.nav-divider--mobile {
   width: 1px;
   height: 16px;
   background: rgba(255, 255, 255, 0.2);
   flex-shrink: 0;
+}
+
+.nav-divider--desktop {
+  display: block;
+}
+
+.nav-divider--mobile {
+  display: none;
 }
 
 .nav-lang-toggle {
@@ -299,10 +465,26 @@ button, a, [role="button"] {
 }
 
 .nav-toggle span {
+  display: block;
   width: 18px;
   height: 2px;
   background: var(--color-black);
-  transition: var(--transition-fast);
+  border-radius: 1px;
+  transform-origin: center;
+  /* Same duration + easing on transform and opacity so close mirrors open (true reverse). */
+  transition:
+    transform 0.38s cubic-bezier(0.25, 0.1, 0.25, 1),
+    opacity 0.38s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.nav-toggle span:nth-child(1),
+.nav-toggle span:nth-child(3) {
+  transform: translateY(0) rotate(0deg);
+}
+
+.nav-toggle span:nth-child(2) {
+  opacity: 1;
+  transform: scaleX(1);
 }
 
 .nav-toggle,
@@ -560,6 +742,50 @@ button, a, [role="button"] {
   flex-wrap: wrap;
 }
 
+.hero-slide .hero-cta {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  justify-content: center;
+  margin-top: var(--spacing-xl);
+  opacity: 0;
+  transform: translateY(24px);
+  animation: heroLineIntro 0.6s ease-out 1.15s forwards;
+}
+
+.hero-cta-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  color: #1d1d1f;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 14px 28px;
+  min-height: 48px;
+  border-radius: 980px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.28);
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero-cta-btn:hover {
+  background: #ffffff;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.35);
+  transform: scale(1.02);
+}
+
+.hero-cta-btn:active {
+  transform: scale(0.98);
+}
+
+.hero-cta-btn:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 3px;
+}
+
 /* Buttons - Apple Style */
 .btn {
   display: inline-flex;
@@ -599,6 +825,10 @@ button, a, [role="button"] {
   padding: var(--spacing-4xl) var(--spacing-lg);
   max-width: var(--max-width-wide);
   margin: 0 auto;
+}
+
+/* Off-screen paint skipping; exclude gallery (first below-hero section — LCP candidate). */
+.section:not(.section-gallery) {
   content-visibility: auto;
   contain-intrinsic-size: auto 500px;
 }
@@ -876,7 +1106,8 @@ button, a, [role="button"] {
 .gallery-item-badge-new {
   position: absolute;
   top: 10px;
-  right: 10px;
+  left: 10px;
+  right: auto;
   z-index: 3;
   padding: 5px 11px;
   font-size: 11px;
@@ -936,6 +1167,23 @@ button, a, [role="button"] {
 }
 
 .gallery-item > img:not(.gallery-item-laurel) {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+}
+
+.gallery-item > picture {
+  position: absolute;
+  inset: 0;
+  display: block;
+  z-index: 0;
+}
+
+.gallery-item > picture > img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -954,15 +1202,59 @@ button, a, [role="button"] {
   pointer-events: none;
 }
 
+/* Phones + narrow windows: portrait tiles and tighter chrome */
+@media (max-width: 900px) {
+  .gallery-item {
+    /* Narrow tiles: aspect matches Those Who Follow poster (mitlaeufer, 900×1273), not 9:16 */
+    /* Bias crop toward upper frame (override per card via --gallery-cover-*) */
+    --gallery-cover-x: 50%;
+    --gallery-cover-y: 24%;
+    width: min(
+      210px,
+      calc(100vw - 2 * var(--spacing-lg) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
+    );
+    aspect-ratio: 900 / 1273;
+  }
+
+  .gallery-item > img:not(.gallery-item-laurel),
+  .gallery-item > picture > img {
+    object-position: var(--gallery-cover-x) var(--gallery-cover-y);
+  }
+
+  .gallery-item-label {
+    padding: var(--spacing-sm) 10px;
+    gap: 3px;
+  }
+
+  .gallery-item-title {
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  .gallery-item-laurel {
+    top: 8px;
+    right: 8px;
+    bottom: auto;
+    left: auto;
+    width: 27px;
+    height: 27px;
+  }
+}
+
 /* Work spotlight — Apple Education “Apps for whatever you’re into” tabbed layout (below carousel) */
 .section-apps-gallery {
   overflow-x: clip;
   overflow-y: visible;
   padding-top: var(--spacing-2xl);
-  padding-bottom: var(--spacing-3xl);
+  padding-bottom: var(--spacing-xl);
   max-width: none;
   padding-left: 0;
   padding-right: 0;
+}
+
+/* Less space between Work spotlight (About) and Listen than default .section stacking */
+.section-listen {
+  padding-top: var(--spacing-xl);
 }
 
 /* Picker + project copy — narrow column; carousel sits full-bleed above */
@@ -990,7 +1282,7 @@ button, a, [role="button"] {
   width: fit-content;
   max-width: 100%;
   margin: 0 auto;
-  padding: 4px;
+  padding: 2px;
   border-radius: 980px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1000,6 +1292,7 @@ button, a, [role="button"] {
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  scroll-behavior: auto;
 }
 
 .apps-gallery-tabs-shell::-webkit-scrollbar {
@@ -1011,7 +1304,7 @@ button, a, [role="button"] {
   flex-wrap: nowrap;
   justify-content: center;
   align-items: stretch;
-  gap: 4px;
+  gap: 2px;
   padding: 0;
   margin: 0;
   width: max-content;
@@ -1028,7 +1321,7 @@ button, a, [role="button"] {
   letter-spacing: -0.018em;
   color: var(--color-gray);
   background: transparent;
-  padding: 9px 14px;
+  padding: 7px 11px;
   border-radius: 980px;
   white-space: nowrap;
   flex-shrink: 0;
@@ -1083,7 +1376,8 @@ button, a, [role="button"] {
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
+  /* Programmatic scroll uses JS easing; keep auto so it doesn’t fight rAF */
+  scroll-behavior: auto;
   scroll-padding-inline: max(16px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
   padding-top: 8px;
   padding-bottom: 16px;
@@ -1107,6 +1401,10 @@ button, a, [role="button"] {
   .apps-gallery-scroller {
     scroll-behavior: auto;
   }
+
+  .apps-gallery-tabs-shell {
+    scroll-behavior: auto;
+  }
 }
 
 .apps-gallery-panel {
@@ -1118,7 +1416,7 @@ button, a, [role="button"] {
   scroll-snap-align: center;
   scroll-snap-stop: always;
   opacity: 0.4;
-  transition: opacity 0.45s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .apps-gallery-panel.is-active {
@@ -1280,6 +1578,39 @@ button, a, [role="button"] {
   margin-top: var(--spacing-lg);
   padding-top: 0;
   border-top: none;
+}
+
+.listen-apple-wrap {
+  display: flex;
+  justify-content: center;
+  padding: var(--spacing-xl) 0 0;
+  margin-top: var(--spacing-md);
+}
+
+.listen-apple-music-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  opacity: 0.92;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.listen-apple-music-link:hover {
+  opacity: 1;
+}
+
+.listen-apple-music-link:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.listen-apple-music-badge {
+  height: clamp(36px, 5vw, 44px);
+  width: auto;
+  max-width: min(92vw, 220px);
+  display: block;
 }
 
 .listen-pill-wrap {
@@ -1877,9 +2208,13 @@ button, a, [role="button"] {
 
   .section-apps-gallery {
     padding-top: var(--spacing-xl);
-    padding-bottom: var(--spacing-2xl);
+    padding-bottom: var(--spacing-lg);
     padding-left: 0;
     padding-right: 0;
+  }
+
+  .section-listen {
+    padding-top: var(--spacing-lg);
   }
 
   .apps-gallery-inner {
@@ -1926,7 +2261,7 @@ button, a, [role="button"] {
 
   .gallery-item {
     width: min(
-      400px,
+      210px,
       calc(100vw - 2 * var(--spacing-sm) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
     );
   }
@@ -1942,18 +2277,221 @@ button, a, [role="button"] {
     padding-right: max(var(--spacing-sm), env(safe-area-inset-right, 0px));
   }
 
-  .nav-links,
-  .nav-divider {
+  /* Dim + blur: opacity/backdrop animate both open and close (no display toggle) */
+  .nav-mobile-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 10010;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    transition:
+      opacity 0.4s cubic-bezier(0.25, 0.1, 0.25, 1),
+      background 0.4s cubic-bezier(0.25, 0.1, 0.25, 1),
+      backdrop-filter 0.45s cubic-bezier(0.25, 0.1, 0.25, 1),
+      -webkit-backdrop-filter 0.45s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  .nav.open .nav-mobile-backdrop {
+    opacity: 1;
+    pointer-events: auto;
+    background: rgba(0, 0, 0, 0.42);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .nav.open .nav-container {
+    position: relative;
+    z-index: 10015;
+    overflow: visible;
+  }
+
+  .nav-logo {
+    min-width: 0;
+    max-width: min(200px, 42vw);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .nav-divider--desktop {
     display: none;
   }
 
+  .nav-divider--mobile {
+    display: block;
+  }
+
+  .nav-end {
+    gap: 4px;
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  /* Sheet: always fixed on narrow viewports; opacity/transform transition open + close */
+  .nav-links {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    position: fixed;
+    left: max(12px, env(safe-area-inset-left, 0px));
+    right: max(12px, env(safe-area-inset-right, 0px));
+    top: calc(env(safe-area-inset-top, 0px) + 72px);
+    padding: 8px 0;
+    margin: 0;
+    background: rgba(12, 12, 14, 0.96);
+    backdrop-filter: saturate(200%) blur(16px);
+    -webkit-backdrop-filter: saturate(200%) blur(16px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
+    z-index: 10020;
+    transform-origin: top center;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: scale(0.97) translateY(-6px);
+    transition:
+      opacity 0.32s cubic-bezier(0.25, 0.1, 0.25, 1),
+      transform 0.32s cubic-bezier(0.25, 0.1, 0.25, 1),
+      visibility 0s linear 0.32s;
+  }
+
+  .nav.open .nav-links {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: scale(1) translateY(0);
+    transition:
+      opacity 0.36s cubic-bezier(0.25, 0.1, 0.25, 1),
+      transform 0.36s cubic-bezier(0.25, 0.1, 0.25, 1),
+      visibility 0s;
+  }
+
+  .nav-links a {
+    padding: 14px 20px;
+    font-size: 17px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.92);
+    text-decoration: none;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 12px;
+    margin: 0 8px;
+  }
+
+  .nav-link-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  .nav-link-icon svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+  }
+
+  .nav-links a:active {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
   .nav-toggle {
-    display: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px;
+    margin-left: 0;
+    flex-shrink: 0;
+    border-radius: 12px;
+  }
+
+  /* Open: middle stroke shrinks first, then outer lines rotate into X (reverse on close). */
+  .nav.open .nav-toggle span:nth-child(1),
+  .nav.open .nav-toggle span:nth-child(3) {
+    transition-delay: 0.12s;
+  }
+
+  .nav.open .nav-toggle span:nth-child(2) {
+    transition-delay: 0s;
+  }
+
+  .nav.nav-has-opened:not(.open) .nav-toggle span:nth-child(1),
+  .nav.nav-has-opened:not(.open) .nav-toggle span:nth-child(3) {
+    transition-delay: 0s;
+  }
+
+  .nav.nav-has-opened:not(.open) .nav-toggle span:nth-child(2) {
+    transition-delay: 0.12s;
+  }
+
+  /* Hamburger → X (Apple-style morph) */
+  .nav.open .nav-toggle span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .nav.open .nav-toggle span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .nav.open .nav-toggle span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .nav-toggle:focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-mobile-backdrop {
+      transition-duration: 0.01ms !important;
+    }
+
+    .nav.open .nav-mobile-backdrop {
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .nav-toggle span {
+      transition-duration: 0.01ms !important;
+      transition-delay: 0s !important;
+    }
+
+    .nav-links {
+      transition-duration: 0.01ms !important;
+    }
+
+    .nav.open .nav-links {
+      opacity: 1;
+      transform: none;
+    }
   }
 
   .nav-menu {
     display: flex;
     align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
   }
 
   .nav-container {
@@ -1963,10 +2501,16 @@ button, a, [role="button"] {
 
   .nav-lang-toggle {
     min-height: 44px;
+    min-width: 44px;
     padding: 10px 14px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .about-demos {
+    width: 100%;
+    max-width: 100%;
   }
 
   .gallery-arrow {
@@ -1994,10 +2538,15 @@ button, a, [role="button"] {
 
   .apps-gallery-tabs-shell {
     justify-content: flex-start;
+    align-self: stretch;
+    width: 100%;
+    max-width: 100%;
     margin-left: calc(-1 * var(--spacing-sm));
     margin-right: calc(-1 * var(--spacing-sm));
-    padding-left: var(--spacing-sm);
-    padding-right: var(--spacing-sm);
+    padding: 2px;
+    padding-left: max(var(--spacing-sm), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--spacing-sm), env(safe-area-inset-right, 0px));
+    box-sizing: border-box;
   }
 
   .apps-gallery-tabs {
@@ -2009,7 +2558,7 @@ button, a, [role="button"] {
   .apps-gallery-tab {
     flex-shrink: 0;
     min-height: 44px;
-    padding: 10px 14px;
+    padding: 8px 10px;
   }
 
   /* Floating pill inner button – 44px on mobile */

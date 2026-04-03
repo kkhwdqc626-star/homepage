@@ -22,6 +22,7 @@ const TRANSLATIONS = {
     sheetClose: 'Close',
     listenPill: 'Listen to more',
     listenPillAria: 'Listen to more (opens in new tab)',
+    listenAppleMusicAria: 'Listen on Apple Music (opens in new tab)',
     contactSubtitle:
       'For inquiries regarding collaborations, commissions, educational or speaker proposals, please feel free to reach out.',
     contactCtaBtn: 'Get in touch',
@@ -128,6 +129,7 @@ const TRANSLATIONS = {
     sheetClose: 'Schließen',
     listenPill: 'Mehr anhören',
     listenPillAria: 'Mehr anhören (öffnet in neuem Tab)',
+    listenAppleMusicAria: 'Bei Apple Music anhören (öffnet in neuem Tab)',
     contactSubtitle:
       'Für Anfragen zu Kooperationen, Aufträgen sowie Bildungs- oder Vortragsangeboten können Sie sich gern melden.',
     contactCtaBtn: 'Kontakt aufnehmen',
@@ -234,6 +236,7 @@ const TRANSLATIONS = {
     sheetClose: 'Fermer',
     listenPill: 'Écouter plus',
     listenPillAria: 'Écouter plus (ouvre dans un nouvel onglet)',
+    listenAppleMusicAria: 'Écouter sur Apple Music (ouvre dans un nouvel onglet)',
     contactSubtitle:
       "Pour toute demande concernant des collaborations, des commandes, des projets pédagogiques ou des interventions en tant qu'intervenant, n'hésitez pas à le contacter.",
     contactCtaBtn: 'Me contacter',
@@ -407,9 +410,22 @@ document.addEventListener('DOMContentLoaded', () => {
     (window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
       (typeof navigator !== 'undefined' && navigator.connection && navigator.connection.saveData));
   if (skipHeavyHeroVideo) {
-    heroVideoEl.removeAttribute('autoplay');
     heroVideoEl.preload = 'none';
     heroVideoEl.pause();
+  } else if (heroVideoEl) {
+    // Defer ~8MB hero clip until after first paint / idle so text & layout win the network/CPU budget
+    const startHeroVideo = () => {
+      heroVideoEl.preload = 'auto';
+      heroVideoEl.load();
+      heroVideoEl.play().catch(() => {});
+    };
+    requestAnimationFrame(() => {
+      if (typeof requestIdleCallback === 'function') {
+        requestIdleCallback(startHeroVideo, { timeout: 2200 });
+      } else {
+        setTimeout(startHeroVideo, 180);
+      }
+    });
   }
 
   // Throttle via requestAnimationFrame for smooth, efficient scroll handling
@@ -480,28 +496,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
   updateHeroScroll();
 
-  // Mobile menu toggle (desktop/tablet only; on mobile, hamburger is hidden, lang picker is shown)
+  // Mobile menu: hamburger + overlay (see styles @media max-width: 734px)
   const navToggle = document.querySelector('.nav-toggle');
-  const navEl = document.querySelector('.nav');
+  const navBackdrop = document.querySelector('[data-nav-backdrop]');
 
-  if (navToggle && navEl) {
-    navToggle.addEventListener('click', () => {
-      const isOpen = navEl.classList.toggle('open');
+  const closeNavMenu = () => {
+    if (!nav?.classList.contains('open')) return;
+    nav.classList.remove('open');
+    navToggle?.setAttribute('aria-expanded', 'false');
+    navToggle?.setAttribute('aria-label', 'Open menu');
+    const sheet = document.getElementById('contact-sheet');
+    if (!sheet?.classList.contains('open')) {
+      document.body.style.overflow = '';
+    }
+  };
+
+  if (navToggle && nav) {
+    navToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = nav.classList.toggle('open');
+      if (isOpen) nav.classList.add('nav-has-opened');
       navToggle.setAttribute('aria-expanded', isOpen);
       navToggle.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
       document.body.style.overflow = isOpen ? 'hidden' : '';
     });
 
-    const navLinks = document.querySelectorAll('.nav-menu a');
-    navLinks.forEach((link) => {
+    document.querySelectorAll('.nav-menu a').forEach((link) => {
       link.addEventListener('click', () => {
-        navEl.classList.remove('open');
-        navToggle.setAttribute('aria-expanded', 'false');
-        navToggle.setAttribute('aria-label', 'Open menu');
-        document.body.style.overflow = '';
+        closeNavMenu();
       });
     });
   }
+
+  navBackdrop?.addEventListener('click', closeNavMenu);
+
+  window.addEventListener(
+    'resize',
+    debounce(() => {
+      if (window.innerWidth > 734) closeNavMenu();
+    }, 150),
+    { passive: true }
+  );
 
   // Contact sheet (bottom sheet)
   const contactSheet = document.getElementById('contact-sheet');
@@ -514,11 +549,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const openContactSheet = () => {
     if (!contactSheet) return;
     contactSheetPreviousFocus = document.activeElement;
-    navEl?.classList.remove('open');
+    nav?.classList.remove('open');
     navToggle?.setAttribute('aria-expanded', 'false');
     navToggle?.setAttribute('aria-label', 'Open menu');
     contactSheet.classList.add('open');
     contactSheet.setAttribute('aria-hidden', 'false');
+    const oscarsImg = contactSheet.querySelector('.contact-sheet-media img');
+    if (oscarsImg && oscarsImg.loading === 'lazy') {
+      oscarsImg.loading = 'eager';
+    }
     contactTrigger?.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
     window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#contact`);
@@ -554,6 +593,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   contactTrigger?.addEventListener('click', handleContactOpen);
   contactGalleryLink?.addEventListener('click', handleContactOpen);
+  document.getElementById('hero-contact-cta')?.addEventListener('click', handleContactOpen);
 
   contactSheetClose?.addEventListener('click', closeContactSheet);
   contactSheetBackdrop?.addEventListener('click', closeContactSheet);
@@ -561,6 +601,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (contactSheet?.classList.contains('open')) closeContactSheet();
+    else closeNavMenu();
   });
 
   if (window.location.hash === '#contact') {
@@ -715,6 +756,11 @@ document.addEventListener('DOMContentLoaded', () => {
     items.forEach((item) => {
       const clone = item.cloneNode(true);
       clone.classList.add('gallery-item-clone');
+      clone.querySelectorAll('img').forEach((img) => {
+        if (img.classList.contains('gallery-item-laurel')) return;
+        img.loading = 'lazy';
+        if ('fetchPriority' in img) img.fetchPriority = 'low';
+      });
       track.appendChild(clone);
     });
 
@@ -736,9 +782,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     let autoscrollRafId = 0;
+    let galleryInView = false;
     const autoscroll = () => {
       autoscrollRafId = 0;
-      if (document.hidden) return;
+      if (document.hidden || !galleryInView) return;
       const now = Date.now();
       let globalSpeedMultiplier = 1;
       if (now < pauseUntil) {
@@ -768,14 +815,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const startAutoscroll = () => {
       if (!autoscrollRafId) autoscrollRafId = requestAnimationFrame(autoscroll);
     };
+
+    const gallerySection = document.getElementById('gallery');
+    if (gallerySection) {
+      const galleryIo = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            galleryInView = entry.isIntersecting;
+            if (galleryInView && !document.hidden) startAutoscroll();
+          });
+        },
+        { root: null, rootMargin: '100px 0px', threshold: 0 }
+      );
+      galleryIo.observe(gallerySection);
+    }
+
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) startAutoscroll();
+      if (!document.hidden && galleryInView) startAutoscroll();
     });
-    startAutoscroll();
 
     window._pauseGalleryAutoscroll = pauseAutoscroll;
 
-    const gallerySection = document.getElementById('gallery');
     if (gallerySection) {
       gallerySection.addEventListener('keydown', (e) => {
         if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
@@ -852,10 +912,84 @@ document.addEventListener('DOMContentLoaded', () => {
       .filter(Boolean);
     const descTexts = [...document.querySelectorAll('.apps-gallery-desc-text')];
     const prefersReducedMotionApps = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const appsTabsShell = document.querySelector('.apps-gallery-tabs-shell');
     let activeIndex = 0;
     let ignoreScrollSync = false;
     let appsGalleryJumpToken = 0;
     let appsGalleryPickerSyncToken = 0;
+
+    /** Apple-like: long ease-out so the carousel coasts into place (not the browser’s short smooth scroll). */
+    const APPS_GALLERY_SCROLL_MS = 840;
+    const APPS_GALLERY_TAB_SCROLL_MS = 560;
+    const easeOutQuint = (t) => 1 - (1 - t) ** 5;
+
+    const animateScrollLeft = (el, targetLeft, durationMs, isCancelled) => {
+      const start = el.scrollLeft;
+      const delta = targetLeft - start;
+      if (Math.abs(delta) < 0.5) return Promise.resolve();
+      if (durationMs <= 0) {
+        el.scrollLeft = targetLeft;
+        return Promise.resolve();
+      }
+      const t0 = performance.now();
+      return new Promise((resolve) => {
+        const step = (now) => {
+          if (isCancelled && isCancelled()) {
+            resolve();
+            return;
+          }
+          const elapsed = now - t0;
+          const t = Math.min(1, elapsed / durationMs);
+          el.scrollLeft = start + delta * easeOutQuint(t);
+          if (t < 1) {
+            requestAnimationFrame(step);
+          } else {
+            el.scrollLeft = targetLeft;
+            resolve();
+          }
+        };
+        requestAnimationFrame(step);
+      });
+    };
+
+    const scrollActiveTabIntoPickerShell = () => {
+      const tab = tabs[activeIndex];
+      if (!tab || !appsTabsShell) return;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const shell = appsTabsShell;
+          const tabRect = tab.getBoundingClientRect();
+          const shellRect = shell.getBoundingClientRect();
+          const tabLeft = tabRect.left - shellRect.left + shell.scrollLeft;
+          const tabW = tabRect.width;
+          const vw = shell.clientWidth;
+          const maxScroll = Math.max(0, shell.scrollWidth - shell.clientWidth);
+
+          let nextLeft = shell.scrollLeft;
+
+          if (tabW <= vw + 0.5) {
+            nextLeft = tabLeft + tabW / 2 - vw / 2;
+          } else {
+            nextLeft = tabLeft;
+          }
+
+          nextLeft = Math.max(0, Math.min(nextLeft, maxScroll));
+
+          const visRight = nextLeft + vw;
+          const tabRight = tabLeft + tabW;
+          if (tabLeft < nextLeft) {
+            nextLeft = Math.max(0, tabLeft);
+          } else if (tabRight > visRight) {
+            nextLeft = Math.min(maxScroll, tabRight - vw);
+          }
+
+          nextLeft = Math.max(0, Math.min(nextLeft, maxScroll));
+
+          const duration = prefersReducedMotionApps ? 0 : APPS_GALLERY_TAB_SCROLL_MS;
+          animateScrollLeft(shell, nextLeft, duration, null);
+        });
+      });
+    };
 
     const updateTabsAndPanels = (i) => {
       const n = tabs.length;
@@ -874,12 +1008,15 @@ document.addEventListener('DOMContentLoaded', () => {
         el.classList.toggle('is-active', on);
         el.setAttribute('aria-hidden', on ? 'false' : 'true');
       });
+      scrollActiveTabIntoPickerShell();
     };
 
-    const scrollToPanel = (index) => {
+    const scrollToPanel = (index, onDone) => {
       const panel = panels[index];
-      if (!panel) return;
-      const behavior = prefersReducedMotionApps ? 'auto' : 'smooth';
+      if (!panel) {
+        onDone?.();
+        return;
+      }
       const scroller = appsScroller;
       const myToken = ++appsGalleryJumpToken;
       const clearJumpIfCurrent = () => {
@@ -888,7 +1025,10 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          if (myToken !== appsGalleryJumpToken) return;
+          if (myToken !== appsGalleryJumpToken) {
+            onDone?.();
+            return;
+          }
           const pr = panel.getBoundingClientRect();
           const sr = scroller.getBoundingClientRect();
           const delta = pr.left + pr.width / 2 - (sr.left + sr.width / 2);
@@ -897,13 +1037,13 @@ document.addEventListener('DOMContentLoaded', () => {
             0,
             Math.min(scroller.scrollLeft + delta, maxScroll)
           );
+          scroller.classList.remove('is-jumping');
           scroller.classList.add('is-jumping');
-          scroller.scrollTo({ left: targetLeft, behavior });
-          const done = () => {
+          const duration = prefersReducedMotionApps ? 0 : APPS_GALLERY_SCROLL_MS;
+          animateScrollLeft(scroller, targetLeft, duration, () => myToken !== appsGalleryJumpToken).then(() => {
             clearJumpIfCurrent();
-          };
-          scroller.addEventListener('scrollend', done, { once: true });
-          window.setTimeout(done, prefersReducedMotionApps ? 80 : 1000);
+            onDone?.();
+          });
         });
       });
     };
@@ -949,13 +1089,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const syncToken = ++appsGalleryPickerSyncToken;
       ignoreScrollSync = true;
       updateTabsAndPanels(index);
-      scrollToPanel(index);
       const endIgnore = () => {
         if (syncToken !== appsGalleryPickerSyncToken) return;
         ignoreScrollSync = false;
       };
-      appsScroller.addEventListener('scrollend', endIgnore, { once: true });
-      window.setTimeout(endIgnore, prefersReducedMotionApps ? 100 : 1100);
+      scrollToPanel(index, endIgnore);
+      window.setTimeout(endIgnore, prefersReducedMotionApps ? 200 : APPS_GALLERY_SCROLL_MS + 180);
     };
 
     panels.forEach((panel, i) => {
@@ -993,6 +1132,14 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollToPanel(0);
       });
     });
+
+    window.addEventListener(
+      'resize',
+      debounce(() => {
+        scrollActiveTabIntoPickerShell();
+      }, 150),
+      { passive: true }
+    );
   }
 
   const aboutNav = document.getElementById('about-nav');
