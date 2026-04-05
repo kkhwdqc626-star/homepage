@@ -1131,6 +1131,12 @@ label[for] {
   transition: opacity var(--transition-smooth), transform var(--transition-smooth);
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .gallery-item:hover {
+    transform: scale(1.02);
+  }
+}
+
 .gallery-item::before {
   content: "";
   position: absolute;
@@ -1143,10 +1149,6 @@ label[for] {
 
 .gallery-container.hovering .gallery-item:not(.focused) {
   opacity: 0.5;
-}
-
-.gallery-item:hover {
-  transform: scale(1.02);
 }
 
 .gallery-item-badge-new {
@@ -1291,7 +1293,7 @@ label[for] {
     overflow: hidden;
     overscroll-behavior-x: contain;
     touch-action: pan-y pinch-zoom;
-    contain: none;
+    contain: paint;
     /* Same edge-bleed as .apps-gallery-scroller narrow (half of ~210px tile) */
     padding-left: max(20px, env(safe-area-inset-left, 0px), calc(50% - min(105px, 47vw)));
     padding-right: max(20px, env(safe-area-inset-right, 0px), calc(50% - min(105px, 47vw)));
@@ -1299,10 +1301,13 @@ label[for] {
 
   .gallery-row .gallery-item {
     touch-action: manipulation;
+    transition: none;
   }
 
   .gallery-row-track {
     will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 
   .gallery-arrow {
