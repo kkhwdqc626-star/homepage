@@ -674,6 +674,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const galleryNativeScrollMq = window.matchMedia('(max-width: 900px)');
   let autoscrollRafId = 0;
+  /** Native scroll: commit scrollLeft at 60Hz to match display cadence on mobile (virtual offset updates every rAF). */
+  let lastNativeAutoscrollDomCommit = 0;
   const rowOffsets = new Map();
   const rowHalfWidthCache = new Map();
   /** Skip scroll→rowOffsets sync when scrollLeft was set by autoscroll (same task). */
@@ -840,6 +842,7 @@ document.addEventListener('DOMContentLoaded', () => {
       cancelAnimationFrame(autoscrollRafId);
       autoscrollRafId = 0;
     }
+    lastNativeAutoscrollDomCommit = 0;
     syncGalleryNativeScrollMode();
     if (typeof window._startGalleryAutoscroll === 'function') {
       window._startGalleryAutoscroll();
@@ -924,14 +927,34 @@ document.addEventListener('DOMContentLoaded', () => {
         const deltaPx = frameSpeed * (dtMs / AUTOSCROLL_TICK_MS);
         let next = before + deltaPx;
         while (next >= halfWidth) next -= halfWidth;
-        setOffset(row, next);
+        rowOffsets.set(row, next);
+        if (!galleryNativeScrollMq.matches) {
+          setOffset(row, next);
+        }
       });
+
+      if (galleryNativeScrollMq.matches) {
+        const t = performance.now();
+        if (
+          lastNativeAutoscrollDomCommit === 0 ||
+          t - lastNativeAutoscrollDomCommit >= AUTOSCROLL_TICK_MS - 0.25
+        ) {
+          lastNativeAutoscrollDomCommit = t;
+          galleryRows.forEach((row) => {
+            if (!getTrack(row)) return;
+            setOffset(row, getOffset(row));
+          });
+        }
+      } else {
+        lastNativeAutoscrollDomCommit = 0;
+      }
 
       autoscrollRafId = requestAnimationFrame(autoscroll);
     };
     const startAutoscroll = () => {
       if (!autoscrollRafId) {
         lastAutoscrollFrameTime = null;
+        lastNativeAutoscrollDomCommit = 0;
         autoscrollRafId = requestAnimationFrame(autoscroll);
       }
     };
@@ -1003,6 +1026,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  /** Avoid accidental link navigation after horizontal drag-scroll (carousel + Work spotlight). */
+  const installHorizontalGalleryTapGuard = (root) => {
+    if (!root) return;
+    const TH = 14;
+    let start = null;
+    root.addEventListener(
+      'pointerdown',
+      (e) => {
+        if (e.pointerType !== 'touch') return;
+        start = { x: e.clientX, y: e.clientY, id: e.pointerId };
+      },
+      { passive: true }
+    );
+    const end = (e) => {
+      if (!start || e.pointerId !== start.id) return;
+      const moved = Math.abs(e.clientX - start.x) + Math.abs(e.clientY - start.y) > TH;
+      start = null;
+      if (moved) root.dataset.galleryTapGuardDrag = '1';
+    };
+    root.addEventListener('pointerup', end, { passive: true });
+    root.addEventListener('pointercancel', end, { passive: true });
+    root.addEventListener(
+      'click',
+      (e) => {
+        if (root.dataset.galleryTapGuardDrag === '1') {
+          e.preventDefault();
+          e.stopPropagation();
+          delete root.dataset.galleryTapGuardDrag;
+        }
+      },
+      true
+    );
+  };
+  galleryRows.forEach((row) => installHorizontalGalleryTapGuard(row));
+
   const ARROW_ANIMATE_MS = 350;
   const easeOutCubic = (t) => 1 - (1 - t) ** 3;
 
@@ -1055,6 +1113,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const appsTablist = document.querySelector('.apps-gallery-tabs');
   const appsScroller = document.getElementById('apps-gallery-scroller');
   if (appsTablist && appsScroller) {
+    installHorizontalGalleryTapGuard(appsScroller);
     const tabs = [...appsTablist.querySelectorAll('[role="tab"]')];
     const panels = tabs
       .map((_, i) => document.getElementById(`apps-gallery-panel-${i}`))
