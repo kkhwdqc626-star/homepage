@@ -699,8 +699,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (galleryNativeScrollMq.matches) {
       track.style.transform = '';
       galleryRowIgnoreScrollSync.add(row);
-      row.scrollLeft = val;
-      rowOffsets.set(row, val);
+      const snapped = Math.round(val);
+      row.scrollLeft = snapped;
+      rowOffsets.set(row, snapped);
       requestAnimationFrame(() => {
         requestAnimationFrame(() => galleryRowIgnoreScrollSync.delete(row));
       });
@@ -848,6 +849,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const EASE_IN_DURATION_MS = 1000;
     let pauseUntil = 0;
     let easeInStart = 0;
+    const galleryTouchPointerIds = new Set();
 
     const pauseAutoscroll = () => {
       const now = Date.now();
@@ -856,12 +858,19 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     let galleryInView = false;
+    /** Wall-clock delta for frame-rate–independent motion (60fps baseline; scales on 120Hz / throttled tabs). */
+    let lastAutoscrollFrameTime = null;
+    let dbgAutoscrollFrameCount = 0;
+    const AUTOSCROLL_TICK_MS = 1000 / 60;
     const autoscroll = () => {
       autoscrollRafId = 0;
       if (document.hidden || !galleryInView) return;
+      const frameNow = performance.now();
       const now = Date.now();
       let globalSpeedMultiplier = 1;
-      if (now < pauseUntil) {
+      if (galleryTouchPointerIds.size > 0) {
+        globalSpeedMultiplier = 0;
+      } else if (now < pauseUntil) {
         globalSpeedMultiplier = 0;
       } else if (easeInStart && now < easeInStart + EASE_IN_DURATION_MS) {
         const elapsed = now - easeInStart;
@@ -870,18 +879,45 @@ document.addEventListener('DOMContentLoaded', () => {
         easeInStart = 0;
       }
 
+      const dtMs =
+        lastAutoscrollFrameTime == null
+          ? AUTOSCROLL_TICK_MS
+          : Math.min(64, Math.max(0.5, frameNow - lastAutoscrollFrameTime));
+      lastAutoscrollFrameTime = frameNow;
+
+      // #region agent log
+      dbgAutoscrollFrameCount++;
+      if (dbgAutoscrollFrameCount % 60 === 0) {
+        fetch('http://127.0.0.1:7710/ingest/7cee6fc4-f978-4891-b24c-239976c02e66', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '22a8fb' },
+          body: JSON.stringify({
+            sessionId: '22a8fb',
+            location: 'script.js:autoscroll',
+            message: 'gallery autoscroll dt sample',
+            data: { dtMs, globalSpeedMultiplier, tickMs: AUTOSCROLL_TICK_MS },
+            timestamp: Date.now(),
+            hypothesisId: 'H-dt',
+            runId: 'post-fix',
+          }),
+        }).catch(() => {});
+      }
+      // #endregion
+
       galleryRows.forEach((row, i) => {
         const track = getTrack(row);
         if (!track) return;
         const speedIndex = row.id === 'galleryRow1' ? 1 : row.id === 'galleryRow0' ? 0 : i;
-        let speed = (AUTOSCROLL_SPEEDS[speedIndex] ?? AUTOSCROLL_SPEEDS[0]) * globalSpeedMultiplier;
+        let frameSpeed = (AUTOSCROLL_SPEEDS[speedIndex] ?? AUTOSCROLL_SPEEDS[0]) * globalSpeedMultiplier;
         const container = row.closest('.gallery-row-container');
         if (container && hoveredContainers.has(container)) {
-          speed *= 0.5;
+          frameSpeed *= 0.5;
         }
         const halfWidth = getHalfWidth(row);
         const before = getOffset(row);
-        let next = before + speed;
+        /* speed = px per frame @ 60Hz → multiply by dt/16.67ms for constant linear velocity */
+        const deltaPx = frameSpeed * (dtMs / AUTOSCROLL_TICK_MS);
+        let next = before + deltaPx;
         while (next >= halfWidth) next -= halfWidth;
         setOffset(row, next);
       });
@@ -889,7 +925,10 @@ document.addEventListener('DOMContentLoaded', () => {
       autoscrollRafId = requestAnimationFrame(autoscroll);
     };
     const startAutoscroll = () => {
-      if (!autoscrollRafId) autoscrollRafId = requestAnimationFrame(autoscroll);
+      if (!autoscrollRafId) {
+        lastAutoscrollFrameTime = null;
+        autoscrollRafId = requestAnimationFrame(autoscroll);
+      }
     };
     window._startGalleryAutoscroll = startAutoscroll;
 
@@ -917,11 +956,29 @@ document.addEventListener('DOMContentLoaded', () => {
       row.addEventListener(
         'pointerdown',
         (e) => {
-          if (e.pointerType === 'touch') window._pauseGalleryAutoscroll?.();
+          if (e.pointerType !== 'touch') return;
+          galleryTouchPointerIds.add(e.pointerId);
+          window._pauseGalleryAutoscroll?.();
         },
         { passive: true }
       );
     });
+    document.addEventListener(
+      'pointerup',
+      (e) => {
+        if (e.pointerType !== 'touch') return;
+        galleryTouchPointerIds.delete(e.pointerId);
+      },
+      { passive: true }
+    );
+    document.addEventListener(
+      'pointercancel',
+      (e) => {
+        if (e.pointerType !== 'touch') return;
+        galleryTouchPointerIds.delete(e.pointerId);
+      },
+      { passive: true }
+    );
 
     if (gallerySection) {
       gallerySection.addEventListener('keydown', (e) => {
@@ -941,7 +998,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  const ARROW_ANIMATE_MS = 280;
+  const ARROW_ANIMATE_MS = 350;
   const easeOutCubic = (t) => 1 - (1 - t) ** 3;
 
   const animateToOffset = (row, targetOffset) => {
