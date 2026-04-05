@@ -680,6 +680,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const galleryPointerDragById = new Map();
   /** Pauses autoscroll while any listed pointer is active (touch on wide; any pointer on narrow drag). */
   const galleryTouchPointerIds = new Set();
+  /** Narrow: per-row inertial scroll state (row → { v px/ms, lastT }). */
+  const galleryInertiaByRow = new Map();
+  let galleryInertiaRafId = 0;
+  /** Set after touch/inertia ends; real impl assigned when autoscroll is active (reduced motion = no-op). */
+  window._scheduleGalleryTouchResume = () => {};
   const getTrack = (row) => row?.querySelector('.gallery-row-track');
   const normalizeOffset = (n, halfWidth) => {
     if (!halfWidth) return 0;
@@ -792,11 +797,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (galleryNativeScrollMq.matches) {
           galleryTouchPointerIds.add(e.pointerId);
           window._pauseGalleryAutoscroll?.();
+          galleryInertiaByRow.delete(row);
           galleryPointerDragById.set(e.pointerId, {
             row,
             lastX: e.clientX,
             startX: e.clientX,
             startY: e.clientY,
+            lastSampleX: e.clientX,
+            lastSampleT: performance.now(),
+            velX: 0,
             locked: false,
           });
           return;
@@ -822,22 +831,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.addEventListener(
-    'pointerup',
-    (e) => {
-      galleryTouchPointerIds.delete(e.pointerId);
-      galleryPointerDragById.delete(e.pointerId);
-    },
-    { passive: true }
-  );
-  document.addEventListener(
-    'pointercancel',
-    (e) => {
-      galleryTouchPointerIds.delete(e.pointerId);
-      galleryPointerDragById.delete(e.pointerId);
-    },
-    { passive: true }
-  );
-  document.addEventListener(
     'pointermove',
     (e) => {
       if (!galleryNativeScrollMq.matches) return;
@@ -854,12 +847,88 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (Math.abs(tdx) <= 10 || Math.abs(tdx) <= Math.abs(tdy)) return;
         st.locked = true;
+        st.lastSampleX = e.clientX;
+        st.lastSampleT = performance.now();
+        st.velX = 0;
       }
       const dx = e.clientX - st.lastX;
       st.lastX = e.clientX;
       const half = getHalfWidth(row);
       const o = normalizeOffset(getOffset(row) - dx, half);
       setOffset(row, o);
+      const now = performance.now();
+      const dt = now - st.lastSampleT;
+      if (dt > 0) {
+        const instDx = e.clientX - st.lastSampleX;
+        st.velX = 0.65 * st.velX + 0.35 * (instDx / dt);
+      }
+      st.lastSampleX = e.clientX;
+      st.lastSampleT = now;
+    },
+    { passive: true }
+  );
+
+  const tickGalleryInertia = () => {
+    galleryInertiaRafId = 0;
+    if (galleryInertiaByRow.size === 0) return;
+    const stamp = performance.now();
+    const doneRows = [];
+    galleryInertiaByRow.forEach((state, row) => {
+      const dt = Math.min(32, Math.max(0.5, stamp - state.lastT));
+      state.lastT = stamp;
+      let v = state.v;
+      const half = getHalfWidth(row);
+      const o = normalizeOffset(getOffset(row) - v * dt, half);
+      setOffset(row, o);
+      v *= Math.exp(-0.0045 * dt);
+      state.v = v;
+      if (Math.abs(v) < 0.00055) doneRows.push(row);
+    });
+    if (doneRows.length) {
+      doneRows.forEach((row) => galleryInertiaByRow.delete(row));
+      window._scheduleGalleryTouchResume(1000);
+    }
+    if (galleryInertiaByRow.size > 0) {
+      galleryInertiaRafId = requestAnimationFrame(tickGalleryInertia);
+    }
+  };
+
+  const endGalleryPointer = (e) => {
+    const st = galleryPointerDragById.get(e.pointerId);
+    galleryTouchPointerIds.delete(e.pointerId);
+    galleryPointerDragById.delete(e.pointerId);
+    // #region agent log
+    fetch('http://127.0.0.1:7710/ingest/7cee6fc4-f978-4891-b24c-239976c02e66',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'22a8fb'},body:JSON.stringify({sessionId:'22a8fb',location:'homepage/script.js:endGalleryPointer',message:'pointerup',data:{narrow:galleryNativeScrollMq.matches,hasSt:!!st,locked:st?.locked,velX:st?.velX},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+    // #endregion
+    if (!galleryNativeScrollMq.matches) return;
+    if (st && st.row) {
+      const row = st.row;
+      const v = st.velX;
+      if (st.locked && Math.abs(v) > 0.12) {
+        galleryInertiaByRow.set(row, { v, lastT: performance.now() });
+        if (!galleryInertiaRafId) {
+          galleryInertiaRafId = requestAnimationFrame(tickGalleryInertia);
+        }
+        // #region agent log
+        fetch('http://127.0.0.1:7710/ingest/7cee6fc4-f978-4891-b24c-239976c02e66',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'22a8fb'},body:JSON.stringify({sessionId:'22a8fb',location:'homepage/script.js:endGalleryPointer',message:'inertiaStart',data:{v},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+        // #endregion
+      } else {
+        window._scheduleGalleryTouchResume(1000);
+      }
+    }
+  };
+
+  document.addEventListener('pointerup', endGalleryPointer, { passive: true });
+  document.addEventListener(
+    'pointercancel',
+    (e) => {
+      const st = galleryPointerDragById.get(e.pointerId);
+      galleryPointerDragById.delete(e.pointerId);
+      galleryTouchPointerIds.delete(e.pointerId);
+      if (st?.row) galleryInertiaByRow.delete(st.row);
+      if (galleryNativeScrollMq.matches) {
+        window._scheduleGalleryTouchResume(1000);
+      }
     },
     { passive: true }
   );
@@ -913,7 +982,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const frameNow = performance.now();
       const now = Date.now();
       let globalSpeedMultiplier = 1;
-      if (galleryTouchPointerIds.size > 0) {
+      if (galleryTouchPointerIds.size > 0 || galleryInertiaByRow.size > 0) {
         globalSpeedMultiplier = 0;
       } else if (now < pauseUntil) {
         globalSpeedMultiplier = 0;
@@ -977,6 +1046,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window._pauseGalleryAutoscroll = pauseAutoscroll;
+    window._scheduleGalleryTouchResume = (delayMs) => {
+      const nowWall = Date.now();
+      pauseUntil = nowWall + delayMs;
+      easeInStart = nowWall + delayMs;
+      // #region agent log
+      fetch('http://127.0.0.1:7710/ingest/7cee6fc4-f978-4891-b24c-239976c02e66',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'22a8fb'},body:JSON.stringify({sessionId:'22a8fb',location:'homepage/script.js:_scheduleGalleryTouchResume',message:'scheduleResume',data:{delayMs,pauseUntil},timestamp:Date.now(),hypothesisId:'H3'})}).catch(()=>{});
+      // #endregion
+    };
 
     if (gallerySection) {
       gallerySection.addEventListener('keydown', (e) => {
