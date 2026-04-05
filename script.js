@@ -666,20 +666,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Gallery: infinite auto-scroll. Wide viewports use transform on the track; narrow viewports
-  // use native horizontal scroll on .gallery-row so touch/trackpad can scrub (same speeds).
+  // Gallery: infinite auto-scroll via GPU translate3d on the track (all viewports). Narrow:
+  // pointer drag + horizontal wheel pan; avoids scrollLeft autoscroll jank on mobile Safari.
   const galleryRows = document.querySelectorAll('.gallery-row');
   /* px per frame per row — second row slower than the first */
   const AUTOSCROLL_SPEEDS = [0.25, 0.13];
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const galleryNativeScrollMq = window.matchMedia('(max-width: 900px)');
   let autoscrollRafId = 0;
-  /** Native scroll: commit scrollLeft at 60Hz to match display cadence on mobile (virtual offset updates every rAF). */
-  let lastNativeAutoscrollDomCommit = 0;
   const rowOffsets = new Map();
   const rowHalfWidthCache = new Map();
-  /** Skip scroll→rowOffsets sync when scrollLeft was set by autoscroll (same task). */
-  const galleryRowIgnoreScrollSync = new WeakSet();
+  /** Narrow viewports: active pointer drag for transform-based pan (pointerId → { row, lastX }). */
+  const galleryPointerDragById = new Map();
+  /** Pauses autoscroll while any listed pointer is active (touch on wide; any pointer on narrow drag). */
+  const galleryTouchPointerIds = new Set();
   const getTrack = (row) => row?.querySelector('.gallery-row-track');
   const normalizeOffset = (n, halfWidth) => {
     if (!halfWidth) return 0;
@@ -688,34 +688,13 @@ document.addEventListener('DOMContentLoaded', () => {
     while (x < 0) x += halfWidth;
     return x;
   };
-  const getOffset = (row) => {
-    if (galleryNativeScrollMq.matches) {
-      const half = getHalfWidth(row);
-      return normalizeOffset(rowOffsets.get(row) ?? 0, half);
-    }
-    return rowOffsets.get(row) ?? 0;
-  };
+  const getOffset = (row) => rowOffsets.get(row) ?? 0;
+  /** GPU path for all viewports — avoids scrollLeft jank on mobile Safari during autoscroll. */
   const setOffset = (row, val) => {
     const track = getTrack(row);
     if (!track) return;
-    if (galleryNativeScrollMq.matches) {
-      track.style.transform = '';
-      galleryRowIgnoreScrollSync.add(row);
-      const snapped = Math.round(val);
-      /* scrollTo syncs with the scroll layer; time-based autoscroll uses performance.now() dt (60fps baseline). */
-      if (typeof row.scrollTo === 'function') {
-        row.scrollTo({ left: snapped, top: 0 });
-      } else {
-        row.scrollLeft = snapped;
-      }
-      rowOffsets.set(row, snapped);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => galleryRowIgnoreScrollSync.delete(row));
-      });
-    } else {
-      rowOffsets.set(row, val);
-      track.style.transform = `translate3d(${-val}px, 0, 0)`;
-    }
+    rowOffsets.set(row, val);
+    track.style.transform = `translate3d(${-val}px, 0, 0)`;
   };
   const getHalfWidth = (row) => {
     let h = rowHalfWidthCache.get(row);
@@ -807,34 +786,95 @@ document.addEventListener('DOMContentLoaded', () => {
     updateArrowsForRow(row);
 
     row.addEventListener(
-      'scroll',
-      () => {
-        if (galleryNativeScrollMq.matches && !galleryRowIgnoreScrollSync.has(row)) {
-          rowOffsets.set(row, row.scrollLeft);
+      'pointerdown',
+      (e) => {
+        if (e.button !== 0) return;
+        if (galleryNativeScrollMq.matches) {
+          galleryTouchPointerIds.add(e.pointerId);
+          window._pauseGalleryAutoscroll?.();
+          galleryPointerDragById.set(e.pointerId, {
+            row,
+            lastX: e.clientX,
+            startX: e.clientX,
+            startY: e.clientY,
+            locked: false,
+          });
+          return;
         }
+        if (e.pointerType !== 'touch') return;
+        galleryTouchPointerIds.add(e.pointerId);
+        window._pauseGalleryAutoscroll?.();
       },
       { passive: true }
     );
+    row.addEventListener(
+      'wheel',
+      (e) => {
+        if (!galleryNativeScrollMq.matches) return;
+        if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) return;
+        e.preventDefault();
+        const half = getHalfWidth(row);
+        const o = normalizeOffset(getOffset(row) + e.deltaX, half);
+        setOffset(row, o);
+      },
+      { passive: false }
+    );
   });
+
+  document.addEventListener(
+    'pointerup',
+    (e) => {
+      galleryTouchPointerIds.delete(e.pointerId);
+      galleryPointerDragById.delete(e.pointerId);
+    },
+    { passive: true }
+  );
+  document.addEventListener(
+    'pointercancel',
+    (e) => {
+      galleryTouchPointerIds.delete(e.pointerId);
+      galleryPointerDragById.delete(e.pointerId);
+    },
+    { passive: true }
+  );
+  document.addEventListener(
+    'pointermove',
+    (e) => {
+      if (!galleryNativeScrollMq.matches) return;
+      const st = galleryPointerDragById.get(e.pointerId);
+      if (!st) return;
+      const { row } = st;
+      if (!st.locked) {
+        const tdx = e.clientX - st.startX;
+        const tdy = e.clientY - st.startY;
+        if (Math.abs(tdy) > Math.abs(tdx) && Math.abs(tdy) > 10) {
+          galleryPointerDragById.delete(e.pointerId);
+          galleryTouchPointerIds.delete(e.pointerId);
+          return;
+        }
+        if (Math.abs(tdx) <= 10 || Math.abs(tdx) <= Math.abs(tdy)) return;
+        st.locked = true;
+      }
+      const dx = e.clientX - st.lastX;
+      st.lastX = e.clientX;
+      const half = getHalfWidth(row);
+      const o = normalizeOffset(getOffset(row) - dx, half);
+      setOffset(row, o);
+    },
+    { passive: true }
+  );
 
   const syncGalleryNativeScrollMode = () => {
     rowHalfWidthCache.clear();
     galleryRows.forEach((row) => {
       const track = getTrack(row);
       if (!track) return;
-      if (galleryNativeScrollMq.matches) {
-        const half = getHalfWidth(row);
-        const fromTransform = rowOffsets.get(row) ?? 0;
-        track.style.transform = '';
-        const sx = normalizeOffset(fromTransform, half);
-        row.scrollLeft = sx;
-        rowOffsets.set(row, sx);
-      } else {
-        const half = getHalfWidth(row);
-        const fromScroll = normalizeOffset(row.scrollLeft, half);
-        rowOffsets.set(row, fromScroll);
-        setOffset(row, fromScroll);
-      }
+      const half = getHalfWidth(row);
+      const cur = rowOffsets.get(row) ?? 0;
+      track.style.transform = '';
+      const wrapped = normalizeOffset(cur, half);
+      rowOffsets.set(row, wrapped);
+      setOffset(row, wrapped);
     });
   };
   galleryNativeScrollMq.addEventListener('change', () => {
@@ -842,7 +882,6 @@ document.addEventListener('DOMContentLoaded', () => {
       cancelAnimationFrame(autoscrollRafId);
       autoscrollRafId = 0;
     }
-    lastNativeAutoscrollDomCommit = 0;
     syncGalleryNativeScrollMode();
     if (typeof window._startGalleryAutoscroll === 'function') {
       window._startGalleryAutoscroll();
@@ -857,7 +896,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const EASE_IN_DURATION_MS = 1000;
     let pauseUntil = 0;
     let easeInStart = 0;
-    const galleryTouchPointerIds = new Set();
 
     const pauseAutoscroll = () => {
       const now = Date.now();
@@ -868,7 +906,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let galleryInView = false;
     /** Wall-clock delta for frame-rate–independent motion (60fps baseline; scales on 120Hz / throttled tabs). */
     let lastAutoscrollFrameTime = null;
-    let dbgAutoscrollFrameCount = 0;
     const AUTOSCROLL_TICK_MS = 1000 / 60;
     const autoscroll = () => {
       autoscrollRafId = 0;
@@ -893,25 +930,6 @@ document.addEventListener('DOMContentLoaded', () => {
           : Math.min(64, Math.max(0.5, frameNow - lastAutoscrollFrameTime));
       lastAutoscrollFrameTime = frameNow;
 
-      // #region agent log
-      dbgAutoscrollFrameCount++;
-      if (dbgAutoscrollFrameCount % 60 === 0) {
-        fetch('http://127.0.0.1:7710/ingest/7cee6fc4-f978-4891-b24c-239976c02e66', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '22a8fb' },
-          body: JSON.stringify({
-            sessionId: '22a8fb',
-            location: 'script.js:autoscroll',
-            message: 'gallery autoscroll dt sample',
-            data: { dtMs, globalSpeedMultiplier, tickMs: AUTOSCROLL_TICK_MS },
-            timestamp: Date.now(),
-            hypothesisId: 'H-dt',
-            runId: 'post-fix',
-          }),
-        }).catch(() => {});
-      }
-      // #endregion
-
       galleryRows.forEach((row, i) => {
         const track = getTrack(row);
         if (!track) return;
@@ -927,34 +945,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const deltaPx = frameSpeed * (dtMs / AUTOSCROLL_TICK_MS);
         let next = before + deltaPx;
         while (next >= halfWidth) next -= halfWidth;
-        rowOffsets.set(row, next);
-        if (!galleryNativeScrollMq.matches) {
-          setOffset(row, next);
-        }
+        setOffset(row, next);
       });
-
-      if (galleryNativeScrollMq.matches) {
-        const t = performance.now();
-        if (
-          lastNativeAutoscrollDomCommit === 0 ||
-          t - lastNativeAutoscrollDomCommit >= AUTOSCROLL_TICK_MS - 0.25
-        ) {
-          lastNativeAutoscrollDomCommit = t;
-          galleryRows.forEach((row) => {
-            if (!getTrack(row)) return;
-            setOffset(row, getOffset(row));
-          });
-        }
-      } else {
-        lastNativeAutoscrollDomCommit = 0;
-      }
 
       autoscrollRafId = requestAnimationFrame(autoscroll);
     };
     const startAutoscroll = () => {
       if (!autoscrollRafId) {
         lastAutoscrollFrameTime = null;
-        lastNativeAutoscrollDomCommit = 0;
         autoscrollRafId = requestAnimationFrame(autoscroll);
       }
     };
@@ -979,34 +977,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window._pauseGalleryAutoscroll = pauseAutoscroll;
-
-    galleryRows.forEach((row) => {
-      row.addEventListener(
-        'pointerdown',
-        (e) => {
-          if (e.pointerType !== 'touch') return;
-          galleryTouchPointerIds.add(e.pointerId);
-          window._pauseGalleryAutoscroll?.();
-        },
-        { passive: true }
-      );
-    });
-    document.addEventListener(
-      'pointerup',
-      (e) => {
-        if (e.pointerType !== 'touch') return;
-        galleryTouchPointerIds.delete(e.pointerId);
-      },
-      { passive: true }
-    );
-    document.addEventListener(
-      'pointercancel',
-      (e) => {
-        if (e.pointerType !== 'touch') return;
-        galleryTouchPointerIds.delete(e.pointerId);
-      },
-      { passive: true }
-    );
 
     if (gallerySection) {
       gallerySection.addEventListener('keydown', (e) => {

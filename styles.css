@@ -1286,39 +1286,23 @@ label[for] {
     height: 27px;
   }
 
-  /* Native horizontal scroll + touch scrub; autoscroll uses scrollLeft (see script.js) */
+  /* Transform-based track (GPU); pan via pointer + wheel — not scrollLeft (smoother autoscroll). */
   .gallery-row {
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden;
     overscroll-behavior-x: contain;
-    scroll-snap-type: none;
+    touch-action: pan-y pinch-zoom;
+    contain: none;
     /* Same edge-bleed as .apps-gallery-scroller narrow (half of ~210px tile) */
     padding-left: max(20px, env(safe-area-inset-left, 0px), calc(50% - min(105px, 47vw)));
     padding-right: max(20px, env(safe-area-inset-right, 0px), calc(50% - min(105px, 47vw)));
-    scroll-padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
-    touch-action: pan-x;
-    contain: none;
-    /* Promote scroll layer for smoother rAF-driven autoscroll on mobile */
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    /* Scroll without showing overlay scrollbars (macOS Safari/Chrome, Firefox) */
-    scrollbar-width: none;
-    -ms-overflow-style: none;
   }
 
   .gallery-row .gallery-item {
-    touch-action: pan-x;
-  }
-
-  .gallery-row::-webkit-scrollbar {
-    display: none;
-    width: 0;
-    height: 0;
+    touch-action: manipulation;
   }
 
   .gallery-row-track {
-    will-change: auto;
+    will-change: transform;
   }
 
   .gallery-arrow {
