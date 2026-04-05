@@ -1252,7 +1252,7 @@ label[for] {
     --gallery-cover-y: 24%;
     width: min(
       210px,
-      calc(100vw - 2 * var(--spacing-lg) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
+      calc(100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
     );
     aspect-ratio: 900 / 1273;
   }
@@ -1288,9 +1288,15 @@ label[for] {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
     scroll-snap-type: none;
-    scroll-padding-inline: var(--spacing-lg);
+    /* Edge-to-edge with the viewport; only inset for notches (viewport-fit=cover) */
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    scroll-padding-inline: 0;
     touch-action: pan-x;
     contain: none;
+    /* Promote scroll layer for smoother rAF-driven autoscroll on mobile */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
     /* Scroll without showing overlay scrollbars (macOS Safari/Chrome, Firefox) */
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -2386,6 +2392,12 @@ label[for] {
       var(--spacing-2xl) max(var(--spacing-md), env(safe-area-inset-right, 0px));
   }
 
+  /* Full-bleed carousel: .section mobile padding would shrink gallery width — keep rows viewport-wide */
+  .section.section-gallery {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .section-apps-gallery {
     padding-top: var(--spacing-xl);
     padding-bottom: var(--spacing-lg);
@@ -2443,18 +2455,6 @@ label[for] {
     font-size: clamp(18px, 0.45rem + 3.8vw, 22px);
     padding: 16px 32px;
     min-height: 52px;
-  }
-
-  .gallery-item {
-    width: min(
-      210px,
-      calc(100vw - 2 * var(--spacing-sm) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
-    );
-  }
-
-  .gallery-row {
-    padding-left: max(var(--spacing-sm), env(safe-area-inset-left, 0px));
-    padding-right: max(var(--spacing-sm), env(safe-area-inset-right, 0px));
   }
 
   /* Dim + blur: opacity/backdrop animate both open and close (no display toggle) */

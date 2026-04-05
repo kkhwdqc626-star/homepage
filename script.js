@@ -700,7 +700,12 @@ document.addEventListener('DOMContentLoaded', () => {
       track.style.transform = '';
       galleryRowIgnoreScrollSync.add(row);
       const snapped = Math.round(val);
-      row.scrollLeft = snapped;
+      /* scrollTo syncs with the scroll layer; time-based autoscroll uses performance.now() dt (60fps baseline). */
+      if (typeof row.scrollTo === 'function') {
+        row.scrollTo({ left: snapped, top: 0 });
+      } else {
+        row.scrollLeft = snapped;
+      }
       rowOffsets.set(row, snapped);
       requestAnimationFrame(() => {
         requestAnimationFrame(() => galleryRowIgnoreScrollSync.delete(row));
