@@ -666,21 +666,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Gallery: infinite auto-scroll via GPU translate3d on the track (all viewports). Narrow:
-  // pointer drag + horizontal wheel pan; avoids scrollLeft autoscroll jank on mobile Safari.
+  // Gallery: infinite auto-scroll via GPU translate3d on the track (all viewports). Pointer drag,
+  // inertia, and horizontal wheel pan everywhere (touch-friendly on desktop); avoids scrollLeft jank.
   const galleryRows = document.querySelectorAll('.gallery-row');
-  /* px per frame per row — second row slower than the first */
-  const AUTOSCROLL_SPEEDS = [0.25, 0.13];
+  /* px per frame per row — second row slower than the first (25% faster than 0.25 / 0.13 baseline) */
+  const AUTOSCROLL_SPEEDS = [0.3125, 0.1625];
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const galleryNativeScrollMq = window.matchMedia('(max-width: 900px)');
   let autoscrollRafId = 0;
   const rowOffsets = new Map();
   const rowHalfWidthCache = new Map();
-  /** Narrow viewports: active pointer drag for transform-based pan (pointerId → { row, lastX }). */
+  /** Active pointer drag for transform-based pan (pointerId → state). */
   const galleryPointerDragById = new Map();
-  /** Pauses autoscroll while any listed pointer is active (touch on wide; any pointer on narrow drag). */
+  /** Pauses autoscroll while any listed pointer is active on a gallery row. */
   const galleryTouchPointerIds = new Set();
-  /** Narrow: per-row inertial scroll state (row → { v px/ms, lastT }). */
+  /** Per-row inertial scroll state (row → { v px/ms, lastT }). */
   const galleryInertiaByRow = new Map();
   let galleryInertiaRafId = 0;
   /** Set after touch/inertia ends; real impl assigned when autoscroll is active (reduced motion = no-op). */
@@ -794,32 +794,25 @@ document.addEventListener('DOMContentLoaded', () => {
       'pointerdown',
       (e) => {
         if (e.button !== 0) return;
-        if (galleryNativeScrollMq.matches) {
-          galleryTouchPointerIds.add(e.pointerId);
-          window._pauseGalleryAutoscroll?.();
-          galleryInertiaByRow.delete(row);
-          galleryPointerDragById.set(e.pointerId, {
-            row,
-            lastX: e.clientX,
-            startX: e.clientX,
-            startY: e.clientY,
-            lastSampleX: e.clientX,
-            lastSampleT: performance.now(),
-            velX: 0,
-            locked: false,
-          });
-          return;
-        }
-        if (e.pointerType !== 'touch') return;
         galleryTouchPointerIds.add(e.pointerId);
         window._pauseGalleryAutoscroll?.();
+        galleryInertiaByRow.delete(row);
+        galleryPointerDragById.set(e.pointerId, {
+          row,
+          lastX: e.clientX,
+          startX: e.clientX,
+          startY: e.clientY,
+          lastSampleX: e.clientX,
+          lastSampleT: performance.now(),
+          velX: 0,
+          locked: false,
+        });
       },
       { passive: true }
     );
     row.addEventListener(
       'wheel',
       (e) => {
-        if (!galleryNativeScrollMq.matches) return;
         if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) return;
         e.preventDefault();
         const half = getHalfWidth(row);
@@ -833,7 +826,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener(
     'pointermove',
     (e) => {
-      if (!galleryNativeScrollMq.matches) return;
       const st = galleryPointerDragById.get(e.pointerId);
       if (!st) return;
       const { row } = st;
@@ -897,10 +889,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const st = galleryPointerDragById.get(e.pointerId);
     galleryTouchPointerIds.delete(e.pointerId);
     galleryPointerDragById.delete(e.pointerId);
-    // #region agent log
-    fetch('http://127.0.0.1:7710/ingest/7cee6fc4-f978-4891-b24c-239976c02e66',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'22a8fb'},body:JSON.stringify({sessionId:'22a8fb',location:'homepage/script.js:endGalleryPointer',message:'pointerup',data:{narrow:galleryNativeScrollMq.matches,hasSt:!!st,locked:st?.locked,velX:st?.velX},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-    // #endregion
-    if (!galleryNativeScrollMq.matches) return;
     if (st && st.row) {
       const row = st.row;
       const v = st.velX;
@@ -909,9 +897,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!galleryInertiaRafId) {
           galleryInertiaRafId = requestAnimationFrame(tickGalleryInertia);
         }
-        // #region agent log
-        fetch('http://127.0.0.1:7710/ingest/7cee6fc4-f978-4891-b24c-239976c02e66',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'22a8fb'},body:JSON.stringify({sessionId:'22a8fb',location:'homepage/script.js:endGalleryPointer',message:'inertiaStart',data:{v},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-        // #endregion
       } else {
         window._scheduleGalleryTouchResume(1000);
       }
@@ -925,10 +910,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const st = galleryPointerDragById.get(e.pointerId);
       galleryPointerDragById.delete(e.pointerId);
       galleryTouchPointerIds.delete(e.pointerId);
-      if (st?.row) galleryInertiaByRow.delete(st.row);
-      if (galleryNativeScrollMq.matches) {
-        window._scheduleGalleryTouchResume(1000);
-      }
+      if (!st?.row) return;
+      galleryInertiaByRow.delete(st.row);
+      window._scheduleGalleryTouchResume(1000);
     },
     { passive: true }
   );
@@ -956,9 +940,7 @@ document.addEventListener('DOMContentLoaded', () => {
       window._startGalleryAutoscroll();
     }
   });
-  if (galleryNativeScrollMq.matches) {
-    syncGalleryNativeScrollMode();
-  }
+  syncGalleryNativeScrollMode();
 
   if (!prefersReducedMotion) {
     const ARROW_PAUSE_MS = 500;
@@ -1050,27 +1032,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const nowWall = Date.now();
       pauseUntil = nowWall + delayMs;
       easeInStart = nowWall + delayMs;
-      // #region agent log
-      fetch('http://127.0.0.1:7710/ingest/7cee6fc4-f978-4891-b24c-239976c02e66',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'22a8fb'},body:JSON.stringify({sessionId:'22a8fb',location:'homepage/script.js:_scheduleGalleryTouchResume',message:'scheduleResume',data:{delayMs,pauseUntil},timestamp:Date.now(),hypothesisId:'H3'})}).catch(()=>{});
-      // #endregion
     };
-
-    if (gallerySection) {
-      gallerySection.addEventListener('keydown', (e) => {
-        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-        const container = e.target.closest('.gallery-row-container');
-        if (!container) return;
-        const prev = container.querySelector('.gallery-arrow-prev');
-        const next = container.querySelector('.gallery-arrow-next');
-        if (e.key === 'ArrowLeft' && prev) {
-          e.preventDefault();
-          prev.click();
-        } else if (e.key === 'ArrowRight' && next) {
-          e.preventDefault();
-          next.click();
-        }
-      });
-    }
   }
 
   /** Avoid accidental link navigation after horizontal drag-scroll (carousel + Work spotlight). */
@@ -1081,7 +1043,7 @@ document.addEventListener('DOMContentLoaded', () => {
     root.addEventListener(
       'pointerdown',
       (e) => {
-        if (e.pointerType !== 'touch') return;
+        if (e.button !== 0) return;
         start = { x: e.clientX, y: e.clientY, id: e.pointerId };
       },
       { passive: true }

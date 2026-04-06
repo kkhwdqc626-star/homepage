@@ -1020,7 +1020,7 @@ label[for] {
 .section-gallery {
   overflow-x: clip;
   overflow-y: visible;
-  padding-bottom: var(--spacing-2xl);
+  padding-bottom: var(--spacing-xl);
   max-width: none;
   padding-left: 0;
   padding-right: 0;
@@ -1093,17 +1093,31 @@ label[for] {
   right: var(--spacing-lg);
 }
 
+/* Desktop: drag / wheel / trackpad only — no prev/next chrome (narrow viewports already hide arrows) */
+@media (min-width: 901px) {
+  .gallery-arrow {
+    display: none !important;
+  }
+}
+
 .gallery-row {
   position: relative;
   width: 100%;
   min-width: 0;
-  /* Match .apps-gallery-scroller: centered insets so tiles peek past the viewport edges */
-  padding-left: max(20px, env(safe-area-inset-left, 0px), calc(50% - min(200px, 47vw)));
-  padding-right: max(20px, env(safe-area-inset-right, 0px), calc(50% - min(200px, 47vw)));
+  cursor: grab;
+  touch-action: pan-y pinch-zoom;
+  overscroll-behavior-x: contain;
+  /* First tile near the left with comfortable padding; right keeps a peek for infinite scroll (~half tile) */
+  padding-left: max(16px, var(--spacing-md), env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px), calc(50% - min(200px, 47vw)));
   padding-top: 0;
   padding-bottom: 0;
   overflow: hidden;
   contain: layout style;
+}
+
+.gallery-row:active {
+  cursor: grabbing;
 }
 
 .gallery-row-track {
@@ -1257,6 +1271,7 @@ label[for] {
     /* Bias crop toward upper frame (override per card via --gallery-cover-*) */
     --gallery-cover-x: 50%;
     --gallery-cover-y: 24%;
+    scroll-snap-align: start;
     width: min(
       210px,
       calc(100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
@@ -1294,9 +1309,9 @@ label[for] {
     overscroll-behavior-x: contain;
     touch-action: pan-y pinch-zoom;
     contain: paint;
-    /* Same edge-bleed as .apps-gallery-scroller narrow (half of ~210px tile) */
-    padding-left: max(20px, env(safe-area-inset-left, 0px), calc(50% - min(105px, 47vw)));
-    padding-right: max(20px, env(safe-area-inset-right, 0px), calc(50% - min(105px, 47vw)));
+    /* First tile aligns to the left with comfortable padding; right keeps a peek for infinite scroll */
+    padding-left: max(16px, var(--spacing-md), env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px), calc(50% - min(105px, 47vw)));
   }
 
   .gallery-row .gallery-item {
@@ -1319,7 +1334,7 @@ label[for] {
 .section-apps-gallery {
   overflow-x: clip;
   overflow-y: visible;
-  padding-top: var(--spacing-2xl);
+  padding-top: var(--spacing-xl);
   padding-bottom: var(--spacing-xl);
   max-width: none;
   padding-left: 0;
@@ -2395,10 +2410,11 @@ label[for] {
   .section.section-gallery {
     padding-left: 0;
     padding-right: 0;
+    padding-bottom: var(--spacing-md);
   }
 
   .section-apps-gallery {
-    padding-top: var(--spacing-xl);
+    padding-top: var(--spacing-md);
     padding-bottom: var(--spacing-lg);
     padding-left: 0;
     padding-right: 0;
@@ -2744,5 +2760,48 @@ label[for] {
   .floating-pill-btn {
     width: var(--touch-target-min);
     height: var(--touch-target-min);
+  }
+}
+
+/* Hero — short viewports (typical mobile landscape): scale copy to height, tighten chrome, boost contrast */
+@media (max-width: 900px) and (max-height: 520px) {
+  .hero-sticky {
+    padding-top: calc(var(--nav-height) + var(--spacing-sm));
+    padding-bottom: var(--spacing-sm);
+    padding-left: max(12px, env(safe-area-inset-left, 0px));
+    padding-right: max(12px, env(safe-area-inset-right, 0px));
+    align-items: center;
+  }
+
+  .hero-slide {
+    padding-left: max(12px, env(safe-area-inset-left, 0px));
+    padding-right: max(12px, env(safe-area-inset-right, 0px));
+  }
+
+  .hero-line {
+    font-size: clamp(17px, 4.5vmin, 28px);
+    line-height: 1.32;
+    margin-bottom: var(--spacing-sm);
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.85),
+      0 2px 16px rgba(0, 0, 0, 0.55);
+  }
+
+  .hero-slide .hero-cta {
+    margin-top: var(--spacing-sm);
+  }
+
+  .hero-cta-btn {
+    font-size: clamp(14px, 3.2vmin, 17px);
+    padding: 10px 20px;
+    min-height: 44px;
+  }
+
+  .hero-video::after {
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.42) 0%,
+      rgba(0, 0, 0, 0.78) 100%
+    );
   }
 }
