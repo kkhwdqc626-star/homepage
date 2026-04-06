@@ -118,7 +118,9 @@
           </button>
           <div class="accordion-content" id="privacy-6" role="region" aria-labelledby="privacy-6-trigger">
             <p data-i18n="privacyA6">This page may change from time to time. The date below shows when it was last updated.</p>
-            <p class="legal-muted" data-i18n="privacyLastUpdated">Last updated: January 2026</p>
+            <p class="legal-muted">
+              <span data-i18n="privacyLastUpdatedPrefix">Last updated: </span><time id="privacy-last-updated-date" datetime=""></time>
+            </p>
           </div>
         </div>
       </div>
@@ -138,6 +140,6 @@
     </div>
   </footer>
 
-  <script src="script.js" defer></script>
+  <script src="script.js?v=11" defer></script>
 </body>
 </html>

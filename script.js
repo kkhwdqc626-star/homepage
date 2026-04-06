@@ -117,7 +117,7 @@ const TRANSLATIONS = {
     privacyA5: "Under GDPR and similar laws, you can ask to see, correct, or delete any data held about you. Since we don't collect personal data here, there's nothing to access or delete. If you have questions, reach out at <a href=\"mailto:c.lungala@icloud.com\">c.lungala@icloud.com</a>.",
     privacyQ6: 'Continual Changes on the website',
     privacyA6: 'This page may change from time to time. The date below shows when it was last updated.',
-    privacyLastUpdated: 'Last updated: January 2026'
+    privacyLastUpdatedPrefix: 'Last updated: '
   },
   de: {
     skipLink: 'Zum Inhalt springen',
@@ -224,7 +224,7 @@ const TRANSLATIONS = {
     privacyA5: 'Nach DSGVO und ähnlichen Gesetzen können Sie verlangen, Daten einzusehen, zu korrigieren oder zu löschen. Da wir hier keine personenbezogenen Daten sammeln, gibt es nichts einzusehen oder zu löschen. Bei Fragen wenden Sie sich an <a href="mailto:c.lungala@icloud.com">c.lungala@icloud.com</a>.',
     privacyQ6: 'Änderungen an der Website',
     privacyA6: 'Diese Seite kann sich von Zeit zu Zeit ändern. Das Datum unten zeigt, wann sie zuletzt aktualisiert wurde.',
-    privacyLastUpdated: 'Zuletzt aktualisiert: Januar 2026'
+    privacyLastUpdatedPrefix: 'Zuletzt aktualisiert: '
   },
   fr: {
     skipLink: 'Aller au contenu',
@@ -331,7 +331,7 @@ const TRANSLATIONS = {
     privacyA5: 'Conformément au RGPD et aux lois similaires, vous pouvez demander à consulter, corriger ou supprimer des données vous concernant. Comme nous ne collectons pas de données personnelles ici, il n\'y a rien à consulter ou supprimer. Si vous avez des questions, contactez-nous à <a href="mailto:c.lungala@icloud.com">c.lungala@icloud.com</a>.',
     privacyQ6: 'Modifications continues du site',
     privacyA6: 'Cette page peut changer de temps en temps. La date ci-dessous indique quand elle a été mise à jour pour la dernière fois.',
-    privacyLastUpdated: 'Dernière mise à jour : janvier 2026'
+    privacyLastUpdatedPrefix: 'Dernière mise à jour : '
   }
 };
 
@@ -361,6 +361,19 @@ let currentLang = getStoredLang();
 
 function t(key) {
   return TRANSLATIONS[currentLang]?.[key] ?? TRANSLATIONS.en[key] ?? key;
+}
+
+/** Privacy page: month + year from current locale (updates when language changes). */
+function formatPrivacyLastUpdatedDate() {
+  const el = document.getElementById('privacy-last-updated-date');
+  if (!el) return;
+  const now = new Date();
+  const localeMap = { en: 'en-US', de: 'de-DE', fr: 'fr-FR' };
+  const locale = localeMap[currentLang] || 'en-US';
+  el.textContent = now.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  el.setAttribute('datetime', `${y}-${m}`);
 }
 
 function applyTranslations() {
@@ -399,6 +412,7 @@ function applyTranslations() {
     langToggle.textContent = labels[currentLang] ?? 'EN';
     langToggle.setAttribute('aria-label', `Switch to ${langNames[nextLang] ?? nextLang}`);
   }
+  formatPrivacyLastUpdatedDate();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
