@@ -85,6 +85,10 @@
   --max-width: 980px;
   --max-width-wide: 1200px;
   --nav-height: 64px;
+
+  /* Footer — Apple-style band: grey strip, hairline only above content column */
+  --footer-bg: #1d1d1f;
+  --footer-border: rgba(255, 255, 255, 0.12);
   --font-body: "Inter", var(--font-system);
 
   /* Fluid type — stronger minimums on phones / narrow viewports */
@@ -2343,33 +2347,48 @@ label[for] {
   }
 }
 
-/* Footer */
+/* Footer — full-width grey band; hairline only spans content width (cf. apple.com product footers) */
 .footer {
+  background: var(--footer-bg);
+  border-top: none;
+  padding: 0;
+}
+
+.footer-inner {
+  max-width: var(--max-width-wide);
+  margin: 0 auto;
   padding: var(--spacing-xl) var(--spacing-lg);
-  border-top: 1px solid var(--color-gray-lighter);
-  background: var(--color-bg-alt);
+  border-top: 1px solid var(--footer-border);
+  box-sizing: border-box;
 }
 
 .footer-content {
-  max-width: var(--max-width-wide);
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  font-size: clamp(13px, 0.2rem + 2.6vw, 15px);
+  color: var(--color-gray-light);
+}
+
+.footer-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   gap: 0 var(--spacing-sm);
-  font-size: clamp(13px, 0.2rem + 2.6vw, 15px);
-  color: var(--color-gray-light);
+  text-align: center;
 }
 
+/* Apple-style footer: links are grey, not blue */
 .footer-content a {
-  color: var(--color-link);
+  color: var(--color-gray-light);
   text-decoration: none;
   transition: color var(--transition-fast);
 }
 
 .footer-content a:hover {
-  color: var(--color-link-hover);
+  color: var(--color-gray);
   text-decoration: underline;
 }
 
@@ -2438,7 +2457,7 @@ label[for] {
     line-height: 1.65;
   }
 
-  .footer {
+  .footer-inner {
     padding-left: max(var(--spacing-md), env(safe-area-inset-left, 0px));
     padding-right: max(var(--spacing-md), env(safe-area-inset-right, 0px));
     padding-bottom: max(var(--spacing-lg), env(safe-area-inset-bottom, 0px));
