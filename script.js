@@ -11,6 +11,9 @@ function debounce(fn, ms) {
   };
 }
 
+/** Set after DOM ready; syncs spotlight bottom padding to active description height. */
+let scheduleSpotlightGapSync = () => {};
+
 const TRANSLATIONS = {
   en: {
     skipLink: 'Skip to Content',
@@ -20,8 +23,6 @@ const TRANSLATIONS = {
     navContact: 'Contact',
     listen: 'Listen',
     sheetClose: 'Close',
-    listenPill: 'Listen to more',
-    listenPillAria: 'Listen to more (opens in new tab)',
     listenAppleMusicAria: 'Listen on Apple Music (opens in new tab)',
     contactSubtitle:
       'For inquiries regarding collaborations, commissions, educational or speaker proposals, please feel free to reach out.',
@@ -52,14 +53,21 @@ const TRANSLATIONS = {
     galleryTab1: 'Der Talentierte Mr. F',
     galleryTab2: 'ISTINA (Truth)',
     galleryTab3: 'Bleeding Fingers Music',
+    galleryTab4: 'Catalyst',
+    galleryTab5: 'Panel Speaker',
     galleryCapKicker0: 'Composer',
     galleryCapKicker1: 'Documentary',
     galleryCapKicker2: 'Drama',
     galleryCapKicker3: 'Production Music',
+    galleryCapKicker4: 'Teaching',
+    galleryCapKicker5: 'Industry Events',
+    galleryCapTitle5: 'Panel Speaker',
     galleryAlt0: 'Chrisna Lungala — portrait',
     galleryAlt1: 'Der Talentierte Mr. F — documentary still',
     galleryAlt2: 'ISTINA (Truth) — short film still',
     galleryAlt3: 'Bleeding Fingers Music — production still',
+    galleryAlt4: 'Catalyst Institute — Funkhaus Berlin campus',
+    galleryAlt5: 'Chrisna Lungala — panel speaker at industry event',
     gallerySpotDesc0:
       "Based in Munich, Chrisna Lungala is a composer focused on the role of music in storytelling for film and visual media. His work has been recognized by the German Film Music Award for New Talent, an honor that reflects his commitment to creating scores that support and enhance the emotional depth of a project.\n\nChrisna's path has been shaped by the opportunity to contribute to projects recognized by the Student Academy Awards® and Cannes, experiences that have allowed him to grow as a collaborator within the film community. His professional journey includes freelance work for studios such as Hans Zimmer's Bleeding Fingers Music, 2WEI, and Invisible Arts.\n\nDriven by a philosophy that music can be simultaneously simple and deeply complex, Chrisna focuses on creating immersive soundscapes—ranging from intimate dramas and documentaries to high-stakes thrillers and VR experiences.",
     gallerySpotDesc1:
@@ -68,6 +76,12 @@ const TRANSLATIONS = {
       'A photojournalist is threatened by right-wing extremist groups in her Serbian home and flees to Germany with her daughter. But then she also experiences increasingly strong threats and attacks in her new home.\n\nISTINA (Truth) has won the Student Academy Award®, was nominated for a Student BAFTA and also won the Max Ophüls Award in 2023. The film was shot in two countries: Beograd, Serbia and Hamburg, Germany.',
     gallerySpotDesc3:
       'Chrisna is also writing music for Bleeding Fingers as a freelance composer.\n\nBleeding Fingers Music is an award-winning collective of exceptional, sonically diverse composers who create superlative original film, television and multimedia scores. Co-founded by Hans Zimmer, Russell Emanuel & Steven Kofsky, Bleeding Fingers is guided by the principle that collaboration is the catalyst for innovation—and extraordinary music results from empowering artists to be adventurous, experimental and creatively generous.',
+    gallerySpotDesc4:
+      'Chrisna teaches on the Music & Sound Design for Visual Media programme at the Catalyst Institute for Creative Arts and Technology, situated on the grounds of the legendary Funkhaus Studios in Berlin. He helps students develop the tools, techniques and creative confidence to compose and design sound for film, games, installations and new media.\n\nThe programme is a hands-on, interdisciplinary BA that emphasizes learning by doing — building skills through real-world projects that reflect the demands of today\'s evolving media landscape. Students work with both traditional and experimental methods, combining sound with visual media to craft rich, emotionally engaging experiences.',
+    awardFreelanceInstructor: 'Freelance Instructor',
+    awardPanelSpeaker: 'Composer',
+    gallerySpotDesc5:
+      'Beyond composing, Chrisna is a recognised voice in the music-for-media community. He has been invited to moderate and speak on panels at industry events, including the annual GEMA General Assembly and the Filmmusiktage Sachsen-Anhalt in Halle in collaboration with the International Academy of Media and Arts (IAMA).\n\nHe has also co-organised professional networking events alongside institutions and companies such as GEMA, 2WEI Music, Native Instruments and Orchestral Tools, bringing together composers, producers and technologists to exchange ideas and learn from each other.',
     catDocumentary: 'Documentary',
     catDrama: 'Drama',
     catAnimation: 'Animation',
@@ -127,8 +141,6 @@ const TRANSLATIONS = {
     navContact: 'Kontakt',
     listen: 'Hörbeispiele',
     sheetClose: 'Schließen',
-    listenPill: 'Mehr anhören',
-    listenPillAria: 'Mehr anhören (öffnet in neuem Tab)',
     listenAppleMusicAria: 'Bei Apple Music anhören (öffnet in neuem Tab)',
     contactSubtitle:
       'Für Anfragen zu Kooperationen, Aufträgen sowie Bildungs- oder Vortragsangeboten können Sie sich gern melden.',
@@ -159,14 +171,21 @@ const TRANSLATIONS = {
     galleryTab1: 'Der Talentierte Mr. F',
     galleryTab2: 'ISTINA (Wahrheit)',
     galleryTab3: 'Bleeding Fingers Music',
+    galleryTab4: 'Catalyst',
+    galleryTab5: 'Panelsprecher',
     galleryCapKicker0: 'Komponist',
     galleryCapKicker1: 'Dokumentarfilm',
     galleryCapKicker2: 'Drama',
     galleryCapKicker3: 'Produktionsmusik',
+    galleryCapKicker4: 'Lehre',
+    galleryCapKicker5: 'Branchenveranstaltungen',
+    galleryCapTitle5: 'Panelsprecher',
     galleryAlt0: 'Chrisna Lungala — Porträt',
     galleryAlt1: 'Der Talentierte Mr. F — Standbild',
     galleryAlt2: 'ISTINA (Wahrheit) — Standbild',
     galleryAlt3: 'Bleeding Fingers Music — Standbild',
+    galleryAlt4: 'Catalyst Institute — Funkhaus Berlin Campus',
+    galleryAlt5: 'Chrisna Lungala — Panelsprecher bei Branchenveranstaltung',
     gallerySpotDesc0:
       'Chrisna Lungala ist ein in München ansässiger Komponist, der sich auf die Rolle der Musik im Storytelling für Film und visuelle Medien konzentriert. Seine Arbeit wurde mit dem Deutschen Filmmusikpreis für Nachwuchs ausgezeichnet – eine Anerkennung, die sein Engagement für Scores widerspiegelt, die die emotionale Tiefe eines Projekts unterstützen und verstärken.\n\nChrisnas Weg wurde durch die Möglichkeit geprägt, an Projekten mitzuwirken, die von den Student Academy Awards® und Cannes ausgezeichnet wurden – Erfahrungen, die ihn als Kollaborateur in der Filmcommunity wachsen ließen. Seine berufliche Laufbahn umfasst freiberufliche Arbeit für renommierte Studios wie Hans Zimmers Bleeding Fingers Music, 2WEI und Invisible Arts.\n\nGetrieben von der Überzeugung, dass Musik gleichzeitig einfach und tiefgreifend komplex sein kann, konzentriert sich Chrisna auf die Schaffung immersiver Klanglandschaften – von intimen Dramen und Dokumentarfilmen bis hin zu Thrillern und VR-Erlebnissen.',
     gallerySpotDesc1:
@@ -175,6 +194,12 @@ const TRANSLATIONS = {
       'Eine Fotojournalistin wird in ihrer serbischen Heimat von rechtsradikalen Gruppen bedroht und flieht mit ihrer Tochter nach Deutschland. Doch auch in ihrer neuen Heimat erlebt sie zunehmend starke Drohungen und Angriffe.\n\nISTINA (Wahrheit) gewann den Student Academy Award®, war für einen Student BAFTA nominiert und erhielt 2023 auch den Max-Ophüls-Preis. Gedreht wurde in zwei Ländern: Belgrad, Serbien und Hamburg, Deutschland.',
     gallerySpotDesc3:
       'Chrisna schreibt zudem als freiberuflicher Komponist Musik für Bleeding Fingers.\n\nBleeding Fingers Music ist ein preisgekränztes Kollektiv außergewöhnlicher, klanglich vielfältiger Komponistinnen und Komponisten, die herausragende Originalmusik für Film, Fernsehen und Multimedia schaffen. Mitbegründet von Hans Zimmer, Russell Emanuel und Steven Kofsky folgt Bleeding Fingers dem Grundsatz, dass Zusammenarbeit Innovation beflügelt – und außergewöhnliche Musik entsteht, wenn Künstlerinnen und Künstler mutig, experimentierfreudig und großzügig im kreativen Austausch sein dürfen.',
+    gallerySpotDesc4:
+      'Chrisna unterrichtet im Studiengang Music & Sound Design for Visual Media am Catalyst Institute for Creative Arts and Technology, das sich auf dem Gelände der legendären Funkhaus Studios in Berlin befindet. Er unterstützt Studierende dabei, die Werkzeuge, Techniken und das kreative Selbstvertrauen zu entwickeln, um Musik und Sound für Film, Games, Installationen und neue Medien zu gestalten.\n\nDas Programm ist ein praxisorientierter, interdisziplinärer BA, der auf Learning by Doing setzt – Fähigkeiten werden durch reale Projekte aufgebaut, die den Anforderungen der sich wandelnden Medienlandschaft gerecht werden. Studierende arbeiten mit traditionellen wie experimentellen Methoden und verbinden Klang mit visuellen Medien, um eindrucksvolle, emotional fesselnde Erlebnisse zu schaffen.',
+    awardFreelanceInstructor: 'Freiberuflicher Dozent',
+    awardPanelSpeaker: 'Komponist',
+    gallerySpotDesc5:
+      'Neben seiner Arbeit als Komponist ist Chrisna eine anerkannte Stimme in der Musik-für-Medien-Community. Er wurde eingeladen, Panels bei Branchenveranstaltungen zu moderieren und als Referent aufzutreten, darunter die jährliche GEMA-Mitgliederversammlung und die Filmmusiktage Sachsen-Anhalt in Halle in Zusammenarbeit mit der International Academy of Media and Arts (IAMA).\n\nDarüber hinaus hat er professionelle Networking-Events mitorganisiert, gemeinsam mit Institutionen und Unternehmen wie der GEMA, 2WEI Music, Native Instruments und Orchestral Tools, um Komponisten, Produzenten und Technologen zusammenzubringen, Ideen auszutauschen und voneinander zu lernen.',
     catDocumentary: 'Dokumentarfilm',
     catDrama: 'Drama',
     catAnimation: 'Animation',
@@ -234,8 +259,6 @@ const TRANSLATIONS = {
     navContact: 'Contact',
     listen: 'Écouter',
     sheetClose: 'Fermer',
-    listenPill: 'Écouter plus',
-    listenPillAria: 'Écouter plus (ouvre dans un nouvel onglet)',
     listenAppleMusicAria: 'Écouter sur Apple Music (ouvre dans un nouvel onglet)',
     contactSubtitle:
       "Pour toute demande concernant des collaborations, des commandes, des projets pédagogiques ou des interventions en tant qu'intervenant, n'hésitez pas à le contacter.",
@@ -266,14 +289,21 @@ const TRANSLATIONS = {
     galleryTab1: 'Der Talentierte Mr. F',
     galleryTab2: 'ISTINA (Vérité)',
     galleryTab3: 'Bleeding Fingers Music',
+    galleryTab4: 'Catalyst',
+    galleryTab5: 'Intervenant',
     galleryCapKicker0: 'Compositeur',
     galleryCapKicker1: 'Documentaire',
     galleryCapKicker2: 'Drame',
     galleryCapKicker3: 'Musique de production',
+    galleryCapKicker4: 'Enseignement',
+    galleryCapKicker5: 'Événements professionnels',
+    galleryCapTitle5: 'Intervenant',
     galleryAlt0: 'Chrisna Lungala — portrait',
     galleryAlt1: 'Der Talentierte Mr. F — image',
     galleryAlt2: 'ISTINA (Vérité) — image',
     galleryAlt3: 'Bleeding Fingers Music — image',
+    galleryAlt4: 'Catalyst Institute — campus Funkhaus Berlin',
+    galleryAlt5: 'Chrisna Lungala — intervenant lors d\'un événement professionnel',
     gallerySpotDesc0:
       "Basé à Munich, Chrisna Lungala est un compositeur qui se concentre sur le rôle de la musique dans la narration pour le cinéma et les médias visuels. Son travail a été reconnu par le Prix allemand de la musique de film pour les nouveaux talents, un honneur qui reflète son engagement à créer des partitions qui soutiennent et renforcent la profondeur émotionnelle d'un projet.\n\nLe parcours de Chrisna a été façonné par l'opportunité de contribuer à des projets reconnus par les Student Academy Awards® et Cannes, des expériences qui lui ont permis de grandir en tant que collaborateur au sein de la communauté du cinéma. Son parcours professionnel comprend des travaux en freelance pour des studios tels que Bleeding Fingers Music de Hans Zimmer, 2WEI et Invisible Arts.\n\nAnimé par une philosophie selon laquelle la musique peut être à la fois simple et profondément complexe, Chrisna se concentre sur la création d'ambiances sonores immersives – des drames intimes et documentaires aux thrillers à haute tension et expériences en réalité virtuelle.",
     gallerySpotDesc1:
@@ -282,6 +312,12 @@ const TRANSLATIONS = {
       'Une photojournaliste est menacée par des groupes d\'extrême droite dans son pays natal serbe et s\'enfuit en Allemagne avec sa fille. Mais elle y subit aussi des menaces et des attaques de plus en plus graves.\n\nISTINA (Vérité) a remporté le Student Academy Award®, a été nommé pour un Student BAFTA et a également reçu le prix Max Ophüls en 2023. Le film a été tourné dans deux pays : Belgrade, Serbie et Hambourg, Allemagne.',
     gallerySpotDesc3:
       "Chrisna compose également pour Bleeding Fingers en tant que compositeur indépendant.\n\nBleeding Fingers Music est un collectif primé de compositeurs exceptionnels et aux univers sonores variés, qui créent des partitions originales d'exception pour le cinéma, la télévision et le multimédia. Co-fondé par Hans Zimmer, Russell Emanuel et Steven Kofsky, Bleeding Fingers s'appuie sur l'idée que la collaboration est le moteur de l'innovation — et que la musique extraordinaire naît du fait d'encourager les artistes à être audacieux, expérimentaux et généreux sur le plan créatif.",
+    gallerySpotDesc4:
+      "Chrisna enseigne dans le programme Music & Sound Design for Visual Media au Catalyst Institute for Creative Arts and Technology, situé dans l'enceinte des légendaires Funkhaus Studios à Berlin. Il aide les étudiants à développer les outils, techniques et la confiance créative nécessaires pour composer et concevoir du son pour le cinéma, les jeux vidéo, les installations et les nouveaux médias.\n\nLe programme est un BA pratique et interdisciplinaire qui met l'accent sur l'apprentissage par la pratique — les compétences se construisent à travers des projets concrets reflétant les exigences du paysage médiatique actuel. Les étudiants travaillent avec des méthodes traditionnelles et expérimentales, combinant le son et les médias visuels pour créer des expériences riches et émotionnellement captivantes.",
+    awardFreelanceInstructor: 'Enseignant indépendant',
+    awardPanelSpeaker: 'Compositeur',
+    gallerySpotDesc5:
+      "Au-delà de la composition, Chrisna est une voix reconnue dans la communauté de la musique pour les médias. Il a été invité à modérer et intervenir lors de panels dans des événements professionnels, notamment l'Assemblée générale annuelle de la GEMA et les Filmmusiktage Sachsen-Anhalt à Halle en collaboration avec l'International Academy of Media and Arts (IAMA).\n\nIl a également co-organisé des événements de networking professionnel aux côtés d'institutions et d'entreprises telles que la GEMA, 2WEI Music, Native Instruments et Orchestral Tools, réunissant compositeurs, producteurs et technologues pour échanger des idées et apprendre les uns des autres.",
     catDocumentary: 'Documentaire',
     catDrama: 'Drame',
     catAnimation: 'Animation',
@@ -413,6 +449,7 @@ function applyTranslations() {
     langToggle.setAttribute('aria-label', `Switch to ${langNames[nextLang] ?? nextLang}`);
   }
   formatPrivacyLastUpdatedDate();
+  scheduleSpotlightGapSync();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -608,6 +645,7 @@ document.addEventListener('DOMContentLoaded', () => {
   contactTrigger?.addEventListener('click', handleContactOpen);
   contactGalleryLink?.addEventListener('click', handleContactOpen);
   document.getElementById('hero-contact-cta')?.addEventListener('click', handleContactOpen);
+  document.getElementById('listen-contact-cta')?.addEventListener('click', handleContactOpen);
 
   contactSheetClose?.addEventListener('click', closeContactSheet);
   contactSheetBackdrop?.addEventListener('click', closeContactSheet);
@@ -1135,7 +1173,159 @@ document.addEventListener('DOMContentLoaded', () => {
   // Work spotlight — horizontal scroll carousel + picker tabs (smooth scroll to slide)
   const appsTablist = document.querySelector('.apps-gallery-tabs');
   const appsScroller = document.getElementById('apps-gallery-scroller');
+  const spotlightSection = document.getElementById('work-spotlight');
+  const appsDescShell = spotlightSection?.querySelector('.apps-gallery-desc-shell');
   if (appsTablist && appsScroller) {
+    const prefersReducedSpotlightGapMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let spotlightGapFirstApplyDone = false;
+    let lastSpotlightGapPx = null;
+    let spotlightGapHoldTimer = null;
+    let spotlightGapAnimRaf = null;
+    let spotlightGapAnimGeneration = 0;
+    /** After switching spotlight item: keep gallery vertical position for this long, then ease to new gap. */
+    const SPOTLIGHT_GAP_HOLD_MS = 500;
+    const SPOTLIGHT_GAP_DURATION_MS = 500;
+    /** Progress curve (t=0..1) — strong deceleration at end, similar to Apple ease-out. */
+    const easeSpotlightGap = (t) => 1 - (1 - t) ** 5;
+
+    /**
+     * Natural height of the active paragraph. In-page nodes are stacked in one grid cell
+     * and stretch to the tallest slide, so getBoundingClientRect() on the active <p> is wrong.
+     */
+    const measureActiveSpotlightDescHeight = (active, shell) => {
+      if (!active || !shell) return 0;
+      const w = Math.max(1, Math.round(shell.getBoundingClientRect().width));
+      const clone = active.cloneNode(true);
+      clone.style.cssText = [
+        'position:absolute',
+        'left:-9999px',
+        'top:0',
+        `width:${w}px`,
+        'box-sizing:border-box',
+        'margin:0',
+        'visibility:hidden',
+        'pointer-events:none',
+        'opacity:1',
+        'z-index:-1',
+      ].join(';');
+      document.body.appendChild(clone);
+      const h = clone.offsetHeight;
+      document.body.removeChild(clone);
+      return h;
+    };
+
+    const stopSpotlightGapRafAnim = () => {
+      if (spotlightGapAnimRaf != null) {
+        cancelAnimationFrame(spotlightGapAnimRaf);
+        spotlightGapAnimRaf = null;
+      }
+      spotlightGapAnimGeneration++;
+    };
+
+    /** Stop RAF animation and pin --spotlight-desc-trail-gap to current computed padding (freeze layout). */
+    const snapshotSpotlightGapFromComputed = () => {
+      if (!spotlightSection) return;
+      stopSpotlightGapRafAnim();
+      const pb = parseFloat(getComputedStyle(spotlightSection).paddingBottom);
+      if (Number.isFinite(pb) && pb >= 0) {
+        const r = Math.round(pb);
+        lastSpotlightGapPx = r;
+        spotlightSection.style.setProperty('--spotlight-desc-trail-gap', `${r}px`);
+      }
+    };
+
+    /** Animate the CSS variable every frame (WAAPI on padding is unreliable across browsers). */
+    const runSpotlightGapRafAnim = (fromPx, toPx) => {
+      stopSpotlightGapRafAnim();
+      const myGen = spotlightGapAnimGeneration;
+      const from = Number(fromPx);
+      const to = Number(toPx);
+      const t0 = performance.now();
+      const dur = SPOTLIGHT_GAP_DURATION_MS;
+      const step = (now) => {
+        if (myGen !== spotlightGapAnimGeneration) return;
+        const elapsed = now - t0;
+        const u = Math.min(1, elapsed / dur);
+        const eased = easeSpotlightGap(u);
+        const val = from + (to - from) * eased;
+        spotlightSection.style.setProperty('--spotlight-desc-trail-gap', `${Math.round(val * 100) / 100}px`);
+        if (u < 1) {
+          spotlightGapAnimRaf = requestAnimationFrame(step);
+        } else {
+          spotlightGapAnimRaf = null;
+          lastSpotlightGapPx = Math.round(to);
+          spotlightSection.style.setProperty('--spotlight-desc-trail-gap', `${lastSpotlightGapPx}px`);
+        }
+      };
+      spotlightGapAnimRaf = requestAnimationFrame(step);
+    };
+
+    const syncSpotlightToGalleryGap = () => {
+      if (!spotlightSection || !appsDescShell) return;
+      const active = appsDescShell.querySelector('.apps-gallery-desc-text.is-active');
+      const textH = measureActiveSpotlightDescHeight(active, appsDescShell);
+      const G_MIN = 6;
+      const G_MAX = 52;
+      const H_REF = 200;
+      const t = Math.min(1, textH / H_REF);
+      const gap = G_MIN + (G_MAX - G_MIN) * t;
+      const newGap = Math.round(gap);
+
+      if (!spotlightGapFirstApplyDone) {
+        spotlightGapFirstApplyDone = true;
+        lastSpotlightGapPx = newGap;
+        spotlightSection.style.setProperty('--spotlight-desc-trail-gap', `${newGap}px`);
+        return;
+      }
+
+      if (newGap === lastSpotlightGapPx) return;
+
+      if (prefersReducedSpotlightGapMotion) {
+        stopSpotlightGapRafAnim();
+        lastSpotlightGapPx = newGap;
+        spotlightSection.style.setProperty('--spotlight-desc-trail-gap', `${newGap}px`);
+        return;
+      }
+
+      const pb = parseFloat(getComputedStyle(spotlightSection).paddingBottom);
+      const fromPx = Number.isFinite(pb) && pb >= 0 ? pb : lastSpotlightGapPx;
+
+      if (Math.abs(fromPx - newGap) < 0.5) {
+        stopSpotlightGapRafAnim();
+        lastSpotlightGapPx = newGap;
+        spotlightSection.style.setProperty('--spotlight-desc-trail-gap', `${newGap}px`);
+        return;
+      }
+
+      runSpotlightGapRafAnim(fromPx, newGap);
+    };
+
+    scheduleSpotlightGapSync = (opts = {}) => {
+      const hold = opts.hold === true;
+      if (hold) {
+        snapshotSpotlightGapFromComputed();
+        clearTimeout(spotlightGapHoldTimer);
+        spotlightGapHoldTimer = window.setTimeout(() => {
+          spotlightGapHoldTimer = null;
+          requestAnimationFrame(() => {
+            requestAnimationFrame(syncSpotlightToGalleryGap);
+          });
+        }, SPOTLIGHT_GAP_HOLD_MS);
+        return;
+      }
+      clearTimeout(spotlightGapHoldTimer);
+      spotlightGapHoldTimer = null;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(syncSpotlightToGalleryGap);
+      });
+    };
+    if (typeof ResizeObserver !== 'undefined' && appsDescShell) {
+      const ro = new ResizeObserver(() => scheduleSpotlightGapSync());
+      ro.observe(appsDescShell);
+    }
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => scheduleSpotlightGapSync());
+    }
     installHorizontalGalleryTapGuard(appsScroller);
     const tabs = [...appsTablist.querySelectorAll('[role="tab"]')];
     const panels = tabs
@@ -1240,6 +1430,7 @@ document.addEventListener('DOMContentLoaded', () => {
         el.setAttribute('aria-hidden', on ? 'false' : 'true');
       });
       scrollActiveTabIntoPickerShell();
+      scheduleSpotlightGapSync(spotlightGapFirstApplyDone ? { hold: true } : {});
     };
 
     const scrollToPanel = (index, onDone) => {
@@ -1368,6 +1559,7 @@ document.addEventListener('DOMContentLoaded', () => {
       'resize',
       debounce(() => {
         scrollActiveTabIntoPickerShell();
+        scheduleSpotlightGapSync();
       }, 150),
       { passive: true }
     );

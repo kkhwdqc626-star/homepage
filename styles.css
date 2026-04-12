@@ -523,7 +523,7 @@ label[for] {
 .apps-gallery-panel-media-link,
 .apps-gallery-caption,
 .apps-gallery-panel-card,
-.floating-pill,
+.hero-cta-btn,
 .demo-play,
 .demo-progress-bar,
 .demo-track,
@@ -658,119 +658,11 @@ label[for] {
   font-weight: 800;
 }
 
-.hero-typewriter {
-  display: inline;
-}
-
-.hero-typewriter-cursor {
-  display: inline-block;
-  animation: heroCursorBlink 1s step-end infinite;
-  margin-left: 2px;
-}
-
-@keyframes heroCursorBlink {
-  50% { opacity: 0; }
-}
-
-/* Floating pill (Listen section — external link) */
-.floating-pill {
-  position: relative;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: 12px 12px 12px 20px;
-  min-height: 48px;
+/* Listen — bottom CTA uses .hero-cta-btn (same as hero). */
+.listen-pill-wrap .hero-cta-btn {
   max-width: calc(
     100vw - 2 * var(--spacing-lg) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
   );
-  background: rgba(44, 44, 46, 0.55);
-  backdrop-filter: saturate(200%) blur(24px);
-  -webkit-backdrop-filter: saturate(200%) blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 980px;
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
-  cursor: pointer;
-  font-family: var(--font-display);
-  font-size: clamp(16px, 0.35rem + 3vw, 18px);
-  font-weight: 600;
-  letter-spacing: -0.022em;
-  color: #ffffff;
-  opacity: 1;
-  transition:
-    opacity var(--transition-smooth),
-    background var(--transition-fast),
-    transform 0.22s var(--ease-out-standard),
-    box-shadow var(--transition-fast);
-  overflow: hidden;
-}
-
-.floating-pill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    transparent 100%
-  );
-  border-radius: 980px 980px 0 0;
-  pointer-events: none;
-}
-
-.floating-pill-text,
-.floating-pill-btn {
-  position: relative;
-  z-index: 1;
-}
-
-.floating-pill:hover {
-  background: rgba(58, 58, 60, 0.7);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
-}
-
-.floating-pill:active {
-  transform: scale(0.98);
-}
-
-.floating-pill-text {
-  opacity: 1;
-}
-
-.floating-pill-btn {
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #0071e3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  transition:
-    background var(--transition-fast),
-    transform var(--transition-fast);
-}
-
-.floating-pill-btn svg {
-  transition: transform var(--transition-smooth);
-}
-
-.floating-pill:hover .floating-pill-btn {
-  background: #0077ed;
-}
-
-.floating-pill:active .floating-pill-btn {
-  transform: scale(0.95);
 }
 
 .hero-cta {
@@ -1028,6 +920,11 @@ label[for] {
   max-width: none;
   padding-left: 0;
   padding-right: 0;
+}
+
+/* Tight stack under Work spotlight: avoid default .section 4xl top padding (set via sibling rule). */
+.section-apps-gallery + .section.section-gallery {
+  padding-top: clamp(var(--spacing-sm), 2vw, var(--spacing-lg));
 }
 
 .gallery-container {
@@ -1339,7 +1236,8 @@ label[for] {
   overflow-x: clip;
   overflow-y: visible;
   padding-top: var(--spacing-xl);
-  padding-bottom: var(--spacing-xl);
+  /* JS sets --spotlight-desc-trail-gap from active description height (shorter copy → smaller gap to #gallery). */
+  padding-bottom: var(--spotlight-desc-trail-gap, var(--spacing-xl));
   max-width: none;
   padding-left: 0;
   padding-right: 0;
@@ -1454,7 +1352,7 @@ label[for] {
   justify-content: center;
   align-items: stretch;
   gap: 2px;
-  padding: 0;
+  padding: 0 2px;
   margin: 0;
   width: max-content;
   min-width: min-content;
@@ -1514,6 +1412,7 @@ label[for] {
 
   .apps-gallery-tabs {
     gap: 2px;
+    padding: 0 6px;
   }
 
   .apps-gallery-tab {
@@ -1714,13 +1613,10 @@ label[for] {
   margin: 0 auto;
   max-width: 38rem;
   text-align: left;
-  display: grid;
-  grid-template-columns: 1fr;
+  display: block;
 }
 
 .apps-gallery-desc-text {
-  grid-row: 1;
-  grid-column: 1;
   margin: 0;
   font-family: var(--font-body);
   font-size: clamp(16px, 0.25rem + 2.4vw, 17px);
@@ -1735,7 +1631,18 @@ label[for] {
   transition: opacity 0.3s var(--ease-out-standard);
 }
 
+/* Out of flow so shell height matches the active slide only (not the tallest tab). */
+.apps-gallery-desc-text:not(.is-active) {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .apps-gallery-desc-text.is-active {
+  position: relative;
   opacity: 1;
   z-index: 1;
   pointer-events: auto;
@@ -1794,18 +1701,6 @@ label[for] {
   display: flex;
   justify-content: center;
   padding: var(--spacing-2xl) 0 var(--spacing-xl);
-}
-
-.listen-pill-wrap .floating-pill--static {
-  opacity: 1;
-  transform: scaleX(1);
-  animation: none;
-  text-decoration: none;
-}
-
-.listen-pill-wrap .floating-pill--static .floating-pill-text {
-  opacity: 1;
-  animation: none;
 }
 
 /* Listen — ReelCrafter embed (replaces inline demo tracks) */
@@ -2457,7 +2352,7 @@ label[for] {
 
   .section-apps-gallery {
     padding-top: var(--spacing-md);
-    padding-bottom: var(--spacing-lg);
+    padding-bottom: var(--spotlight-desc-trail-gap, var(--spacing-lg));
     padding-left: 0;
     padding-right: 0;
   }
@@ -2486,7 +2381,7 @@ label[for] {
     padding-bottom: max(var(--spacing-lg), env(safe-area-inset-bottom, 0px));
   }
 
-  .floating-pill {
+  .listen-pill-wrap .hero-cta-btn {
     max-width: calc(
       100vw - 2 * var(--spacing-md) - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)
     );
@@ -2790,6 +2685,7 @@ label[for] {
     justify-content: flex-start;
     margin-left: 0;
     margin-right: 0;
+    padding: 0 4px;
   }
 
   .apps-gallery-tab {
@@ -2798,11 +2694,6 @@ label[for] {
     padding: 8px 10px;
   }
 
-  /* Floating pill inner button — touch target */
-  .floating-pill-btn {
-    width: var(--touch-target-min);
-    height: var(--touch-target-min);
-  }
 }
 
 /* Hero — short viewports (typical mobile landscape): scale copy to height, tighten chrome, boost contrast */

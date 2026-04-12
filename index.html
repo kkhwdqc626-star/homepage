@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#000000">
   <title>Chrisna Lungala — Composer for Film & Visual Media</title>
-  <meta name="description" content="Chrisna Lungala is a self-taught composer based in Munich, creating bespoke and evocative music for film and other visual media.">
+  <meta name="description" content="Chrisna Lungala is a self-taught composer based in Munich, creating expressive music for film and other visual media.">
   <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="styles.css?v=19">
 </head>
 <body>
   <a href="#main" class="skip-link" data-i18n="skipLink">Skip to Content</a>
@@ -20,13 +20,13 @@
       <div class="nav-end">
         <div class="nav-menu">
           <div class="nav-links">
-            <a href="#gallery">
-              <span class="nav-link-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
-              <span data-i18n="navWork">Work</span>
-            </a>
             <a href="#work-spotlight" id="about-nav">
               <span class="nav-link-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M6 20v-1.2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4V20"/></svg></span>
               <span data-i18n="navAbout">About</span>
+            </a>
+            <a href="#gallery">
+              <span class="nav-link-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+              <span data-i18n="navWork">Work</span>
             </a>
             <a href="#listen">
               <span class="nav-link-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
@@ -61,7 +61,7 @@
       <div class="hero-sticky">
         <div class="hero-content">
           <div class="hero-slide" data-slide="1">
-            <p class="hero-line hero-line-en" data-lang="en">Chrisna Lungala is a self-taught composer based in Munich, creating <span class="hero-typewriter" id="heroTypewriter"></span><span class="hero-typewriter-cursor" aria-hidden="true">|</span>music for films, TV and games.</p>
+            <p class="hero-line hero-line-en" data-lang="en">Chrisna Lungala is a self-taught composer based in Munich, creating expressive music for films, TV and games.</p>
             <p class="hero-line hero-line-de" data-lang="de" style="display:none;">Chrisna Lungala ist ein Komponist aus München, der eindringliche Musik für Filme, Fernsehen und Spiele schreibt.</p>
             <p class="hero-line hero-line-fr" data-lang="fr" style="display:none;">Chrisna Lungala est un compositeur basé à Munich, qui crée une musique évocatrice pour le cinéma, la télévision et les jeux vidéo.</p>
             <div class="hero-cta">
@@ -73,35 +73,116 @@
       <div class="hero-spacer" aria-hidden="true"></div>
     </section>
 
-    <script>
-    (function(){
-      var el=document.getElementById('heroTypewriter');
-      if(!el)return;
-      if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent='bespoke';var c=document.querySelector('.hero-typewriter-cursor');if(c)c.style.display='none';return;}
-      var words=['bespoke','evocative','expressive','moving','powerful'];
-      var wi=0,ci=0,del=false;
-      function run(){
-        var w=words[wi];
-        if(del){
-          el.textContent=w.substring(0,ci-1);
-          ci--;
-          if(ci===0){del=false;wi=(wi+1)%words.length;setTimeout(run,500);}
-          else setTimeout(run,50);
-        }else{
-          el.textContent=w.substring(0,ci+1);
-          ci++;
-          if(ci===w.length){del=true;setTimeout(run,2000);}
-          else setTimeout(run,80);
-        }
-      }
-      function start(){setTimeout(run,1600);}
-      if(document.hidden){
-        document.addEventListener('visibilitychange',function onV(){
-          if(!document.hidden){document.removeEventListener('visibilitychange',onV);start();}
-        });
-      }else start();
-    })();
-    </script>
+    <!-- Work spotlight — tabbed gallery (Apple Education “Apps for whatever you’re into” pattern) -->
+    <section class="section section-apps-gallery" id="work-spotlight">
+      <div class="apps-gallery-scroller-wrap">
+        <div class="apps-gallery-scroller" id="apps-gallery-scroller" tabindex="0" role="region" aria-roledescription="carousel" data-i18n-aria="galleryCarouselAria">
+          <div class="apps-gallery-panel is-active" id="apps-gallery-panel-0" role="tabpanel" aria-labelledby="apps-gallery-tab-0" data-panel-index="0">
+            <div class="apps-gallery-panel-card">
+              <a href="#" class="apps-gallery-panel-media-link" id="contact-gallery-link" data-open-contact-sheet>
+                <div class="apps-gallery-image-wrap apps-gallery-image-wrap--headshot">
+                  <img src="images/portrait/headshot.jpg?v=2" alt="" width="800" height="800" loading="lazy" decoding="async" fetchpriority="low" data-i18n-alt="galleryAlt0">
+                </div>
+              </a>
+              <div class="apps-gallery-caption">
+                <span class="apps-gallery-caption-kicker" data-i18n="galleryCapKicker0">Composer</span>
+                <span class="apps-gallery-caption-title">Chrisna Lungala</span>
+                <span class="apps-gallery-caption-award" data-i18n="awardGermanFilmmusicYoungTalent">German Filmmusic Award Winner (Young Talent)</span>
+              </div>
+            </div>
+          </div>
+          <div class="apps-gallery-panel" id="apps-gallery-panel-1" role="tabpanel" aria-labelledby="apps-gallery-tab-1" data-panel-index="1">
+            <div class="apps-gallery-panel-card">
+              <a href="https://www.ardmediathek.de/film/der-talentierte-mr-f/Y3JpZDovL21kci5kZS9zZW5kZXJlaWhlbi8yYjcwOGU3OC04YWNjLTQ4OWEtOThiNy00NmVjNGRhMTQxMzAvcHJvZ3JhbS01MzMxMzYtNTA3ODU5" target="_blank" rel="noopener noreferrer" class="apps-gallery-panel-media-link">
+                <div class="apps-gallery-image-wrap">
+                  <span class="gallery-item-badge-new" data-i18n="badgeNew">New</span>
+                  <img src="images/screengrabs/der_talentierte_mr_f.jpg" alt="" width="1200" height="675" loading="lazy" decoding="async" data-i18n-alt="galleryAlt1">
+                </div>
+              </a>
+              <div class="apps-gallery-caption">
+                <span class="apps-gallery-caption-kicker" data-i18n="galleryCapKicker1">Documentary</span>
+                <span class="apps-gallery-caption-title">Der Talentierte Mr. F</span>
+                <span class="apps-gallery-caption-award" data-i18n="awardGrimme">Grimme Award® Winner</span>
+              </div>
+            </div>
+          </div>
+          <div class="apps-gallery-panel" id="apps-gallery-panel-2" role="tabpanel" aria-labelledby="apps-gallery-tab-2" data-panel-index="2">
+            <div class="apps-gallery-panel-card">
+              <a href="https://www.ardmediathek.de/video/kurzfilmnacht/istina-wahrheit/br/Y3JpZDovL2JyLmRlL3ZpZGVvL2I1MGQ2ZGI4LTYzOWMtNDM3Yy1hNmU2LTExZDdhNzlmZmNkYS9icm9hZGNhc3Q" target="_blank" rel="noopener noreferrer" class="apps-gallery-panel-media-link">
+                <div class="apps-gallery-image-wrap">
+                  <img src="images/screengrabs/istina.jpg" alt="" width="1200" height="675" loading="lazy" decoding="async" data-i18n-alt="galleryAlt2">
+                </div>
+              </a>
+              <div class="apps-gallery-caption">
+                <span class="apps-gallery-caption-kicker" data-i18n="galleryCapKicker2">Drama</span>
+                <span class="apps-gallery-caption-title">ISTINA (Truth)</span>
+                <span class="apps-gallery-caption-award" data-i18n="awardStudentOscarWinner">Student Academy Award® Winner</span>
+              </div>
+            </div>
+          </div>
+          <div class="apps-gallery-panel" id="apps-gallery-panel-3" role="tabpanel" aria-labelledby="apps-gallery-tab-3" data-panel-index="3">
+            <div class="apps-gallery-panel-card">
+              <a href="https://www.extrememusic.com/search?isAiSearch=false&amp;isLyricsSearch=false&amp;query=Chrisna%20Mikiele%20Lungala" target="_blank" rel="noopener noreferrer" class="apps-gallery-panel-media-link">
+                <div class="apps-gallery-image-wrap apps-gallery-image-wrap--contain">
+                  <img src="images/screengrabs/bleeding_fingers_music.png" alt="" width="1323" height="419" loading="lazy" decoding="async" data-i18n-alt="galleryAlt3">
+                </div>
+              </a>
+              <div class="apps-gallery-caption">
+                <span class="apps-gallery-caption-kicker" data-i18n="galleryCapKicker3">Production Music</span>
+                <span class="apps-gallery-caption-title">Bleeding Fingers Music</span>
+                <span class="apps-gallery-caption-award" data-i18n="awardFreelanceComposer">Freelance Composer</span>
+              </div>
+            </div>
+          </div>
+          <div class="apps-gallery-panel" id="apps-gallery-panel-4" role="tabpanel" aria-labelledby="apps-gallery-tab-4" data-panel-index="4">
+            <div class="apps-gallery-panel-card">
+              <a href="https://catalyst-berlin.com/music/course/music-sound-design-for-visual-media" target="_blank" rel="noopener noreferrer" class="apps-gallery-panel-media-link">
+                <div class="apps-gallery-image-wrap">
+                  <img src="images/screengrabs/funkhaus.jpg" alt="" width="1200" height="675" loading="lazy" decoding="async" data-i18n-alt="galleryAlt4">
+                </div>
+              </a>
+              <div class="apps-gallery-caption">
+                <span class="apps-gallery-caption-kicker" data-i18n="galleryCapKicker4">Teaching</span>
+                <span class="apps-gallery-caption-title">Catalyst Institute for Creative Arts and Technology</span>
+                <span class="apps-gallery-caption-award" data-i18n="awardFreelanceInstructor">Freelance Instructor</span>
+              </div>
+            </div>
+          </div>
+          <div class="apps-gallery-panel" id="apps-gallery-panel-5" role="tabpanel" aria-labelledby="apps-gallery-tab-5" data-panel-index="5">
+            <div class="apps-gallery-panel-card">
+              <div class="apps-gallery-image-wrap">
+                <img src="images/screengrabs/speaker.jpg" alt="" width="1200" height="675" loading="lazy" decoding="async" data-i18n-alt="galleryAlt5">
+              </div>
+              <div class="apps-gallery-caption">
+                <span class="apps-gallery-caption-kicker" data-i18n="galleryCapKicker5">Industry Events</span>
+                <span class="apps-gallery-caption-title" data-i18n="galleryCapTitle5">Panel Speaker</span>
+                <span class="apps-gallery-caption-award" data-i18n="awardPanelSpeaker">Composer</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="apps-gallery-inner">
+        <div class="apps-gallery-tabs-shell">
+          <div class="apps-gallery-tabs" role="tablist" aria-orientation="horizontal" data-i18n-aria="galleryTablistAria">
+            <button type="button" class="apps-gallery-tab is-active" role="tab" id="apps-gallery-tab-0" aria-selected="true" aria-controls="apps-gallery-panel-0" data-i18n="galleryTab0">About Me</button>
+            <button type="button" class="apps-gallery-tab" role="tab" id="apps-gallery-tab-1" aria-selected="false" aria-controls="apps-gallery-panel-1" tabindex="-1" data-i18n="galleryTab1">Der Talentierte Mr. F</button>
+            <button type="button" class="apps-gallery-tab" role="tab" id="apps-gallery-tab-2" aria-selected="false" aria-controls="apps-gallery-panel-2" tabindex="-1" data-i18n="galleryTab2">ISTINA (Truth)</button>
+            <button type="button" class="apps-gallery-tab" role="tab" id="apps-gallery-tab-3" aria-selected="false" aria-controls="apps-gallery-panel-3" tabindex="-1" data-i18n="galleryTab3">Bleeding Fingers Music</button>
+            <button type="button" class="apps-gallery-tab" role="tab" id="apps-gallery-tab-4" aria-selected="false" aria-controls="apps-gallery-panel-4" tabindex="-1" data-i18n="galleryTab4">Catalyst</button>
+            <button type="button" class="apps-gallery-tab" role="tab" id="apps-gallery-tab-5" aria-selected="false" aria-controls="apps-gallery-panel-5" tabindex="-1" data-i18n="galleryTab5">Panel Speaker</button>
+          </div>
+        </div>
+        <div class="apps-gallery-desc-shell">
+          <p class="apps-gallery-desc-text is-active" data-panel-desc="0" data-i18n="gallerySpotDesc0" aria-hidden="false"></p>
+          <p class="apps-gallery-desc-text" data-panel-desc="1" data-i18n="gallerySpotDesc1" aria-hidden="true"></p>
+          <p class="apps-gallery-desc-text" data-panel-desc="2" data-i18n="gallerySpotDesc2" aria-hidden="true"></p>
+          <p class="apps-gallery-desc-text" data-panel-desc="3" data-i18n="gallerySpotDesc3" aria-hidden="true"></p>
+          <p class="apps-gallery-desc-text" data-panel-desc="4" data-i18n="gallerySpotDesc4" aria-hidden="true"></p>
+          <p class="apps-gallery-desc-text" data-panel-desc="5" data-i18n="gallerySpotDesc5" aria-hidden="true"></p>
+        </div>
+      </div>
+    </section>
 
     <!-- Gallery Section - Apple-style carousel -->
     <section class="section section-gallery" id="gallery">
@@ -265,87 +346,6 @@
       </div>
     </section>
 
-    <!-- Work spotlight — tabbed gallery (Apple Education “Apps for whatever you’re into” pattern) -->
-    <section class="section section-apps-gallery" id="work-spotlight">
-      <div class="apps-gallery-scroller-wrap">
-        <div class="apps-gallery-scroller" id="apps-gallery-scroller" tabindex="0" role="region" aria-roledescription="carousel" data-i18n-aria="galleryCarouselAria">
-          <div class="apps-gallery-panel is-active" id="apps-gallery-panel-0" role="tabpanel" aria-labelledby="apps-gallery-tab-0" data-panel-index="0">
-            <div class="apps-gallery-panel-card">
-              <a href="#" class="apps-gallery-panel-media-link" id="contact-gallery-link" data-open-contact-sheet>
-                <div class="apps-gallery-image-wrap apps-gallery-image-wrap--headshot">
-                  <img src="images/portrait/headshot.jpg?v=2" alt="" width="800" height="800" loading="lazy" decoding="async" fetchpriority="low" data-i18n-alt="galleryAlt0">
-                </div>
-              </a>
-              <div class="apps-gallery-caption">
-                <span class="apps-gallery-caption-kicker" data-i18n="galleryCapKicker0">Composer</span>
-                <span class="apps-gallery-caption-title">Chrisna Lungala</span>
-                <span class="apps-gallery-caption-award" data-i18n="awardGermanFilmmusicYoungTalent">German Filmmusic Award Winner (Young Talent)</span>
-              </div>
-            </div>
-          </div>
-          <div class="apps-gallery-panel" id="apps-gallery-panel-1" role="tabpanel" aria-labelledby="apps-gallery-tab-1" data-panel-index="1">
-            <div class="apps-gallery-panel-card">
-              <a href="https://www.ardmediathek.de/film/der-talentierte-mr-f/Y3JpZDovL21kci5kZS9zZW5kZXJlaWhlbi8yYjcwOGU3OC04YWNjLTQ4OWEtOThiNy00NmVjNGRhMTQxMzAvcHJvZ3JhbS01MzMxMzYtNTA3ODU5" target="_blank" rel="noopener noreferrer" class="apps-gallery-panel-media-link">
-                <div class="apps-gallery-image-wrap">
-                  <span class="gallery-item-badge-new" data-i18n="badgeNew">New</span>
-                  <img src="images/screengrabs/der_talentierte_mr_f.jpg" alt="" width="1200" height="675" loading="lazy" decoding="async" data-i18n-alt="galleryAlt1">
-                </div>
-              </a>
-              <div class="apps-gallery-caption">
-                <span class="apps-gallery-caption-kicker" data-i18n="galleryCapKicker1">Documentary</span>
-                <span class="apps-gallery-caption-title">Der Talentierte Mr. F</span>
-                <span class="apps-gallery-caption-award" data-i18n="awardGrimme">Grimme Award® Winner</span>
-              </div>
-            </div>
-          </div>
-          <div class="apps-gallery-panel" id="apps-gallery-panel-2" role="tabpanel" aria-labelledby="apps-gallery-tab-2" data-panel-index="2">
-            <div class="apps-gallery-panel-card">
-              <a href="https://www.ardmediathek.de/video/kurzfilmnacht/istina-wahrheit/br/Y3JpZDovL2JyLmRlL3ZpZGVvL2I1MGQ2ZGI4LTYzOWMtNDM3Yy1hNmU2LTExZDdhNzlmZmNkYS9icm9hZGNhc3Q" target="_blank" rel="noopener noreferrer" class="apps-gallery-panel-media-link">
-                <div class="apps-gallery-image-wrap">
-                  <img src="images/screengrabs/istina.jpg" alt="" width="1200" height="675" loading="lazy" decoding="async" data-i18n-alt="galleryAlt2">
-                </div>
-              </a>
-              <div class="apps-gallery-caption">
-                <span class="apps-gallery-caption-kicker" data-i18n="galleryCapKicker2">Drama</span>
-                <span class="apps-gallery-caption-title">ISTINA (Truth)</span>
-                <span class="apps-gallery-caption-award" data-i18n="awardStudentOscarWinner">Student Academy Award® Winner</span>
-              </div>
-            </div>
-          </div>
-          <div class="apps-gallery-panel" id="apps-gallery-panel-3" role="tabpanel" aria-labelledby="apps-gallery-tab-3" data-panel-index="3">
-            <div class="apps-gallery-panel-card">
-              <a href="https://www.extrememusic.com/search?isAiSearch=false&amp;isLyricsSearch=false&amp;query=Chrisna%20Mikiele%20Lungala" target="_blank" rel="noopener noreferrer" class="apps-gallery-panel-media-link">
-                <div class="apps-gallery-image-wrap apps-gallery-image-wrap--contain">
-                  <img src="images/screengrabs/bleeding_fingers_music.png" alt="" width="1323" height="419" loading="lazy" decoding="async" data-i18n-alt="galleryAlt3">
-                </div>
-              </a>
-              <div class="apps-gallery-caption">
-                <span class="apps-gallery-caption-kicker" data-i18n="galleryCapKicker3">Production Music</span>
-                <span class="apps-gallery-caption-title">Bleeding Fingers Music</span>
-                <span class="apps-gallery-caption-award" data-i18n="awardFreelanceComposer">Freelance Composer</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="apps-gallery-inner">
-        <div class="apps-gallery-tabs-shell">
-          <div class="apps-gallery-tabs" role="tablist" aria-orientation="horizontal" data-i18n-aria="galleryTablistAria">
-            <button type="button" class="apps-gallery-tab is-active" role="tab" id="apps-gallery-tab-0" aria-selected="true" aria-controls="apps-gallery-panel-0" data-i18n="galleryTab0">About Me</button>
-            <button type="button" class="apps-gallery-tab" role="tab" id="apps-gallery-tab-1" aria-selected="false" aria-controls="apps-gallery-panel-1" tabindex="-1" data-i18n="galleryTab1">Der Talentierte Mr. F</button>
-            <button type="button" class="apps-gallery-tab" role="tab" id="apps-gallery-tab-2" aria-selected="false" aria-controls="apps-gallery-panel-2" tabindex="-1" data-i18n="galleryTab2">ISTINA (Truth)</button>
-            <button type="button" class="apps-gallery-tab" role="tab" id="apps-gallery-tab-3" aria-selected="false" aria-controls="apps-gallery-panel-3" tabindex="-1" data-i18n="galleryTab3">Bleeding Fingers Music</button>
-          </div>
-        </div>
-        <div class="apps-gallery-desc-shell">
-          <p class="apps-gallery-desc-text is-active" data-panel-desc="0" data-i18n="gallerySpotDesc0" aria-hidden="false"></p>
-          <p class="apps-gallery-desc-text" data-panel-desc="1" data-i18n="gallerySpotDesc1" aria-hidden="true"></p>
-          <p class="apps-gallery-desc-text" data-panel-desc="2" data-i18n="gallerySpotDesc2" aria-hidden="true"></p>
-          <p class="apps-gallery-desc-text" data-panel-desc="3" data-i18n="gallerySpotDesc3" aria-hidden="true"></p>
-        </div>
-      </div>
-    </section>
-
     <!-- Listen Section -->
     <section class="section section-listen" id="listen">
       <h2 class="section-title" data-i18n="listen">Listen</h2>
@@ -381,12 +381,7 @@
         </a>
       </div>
       <div class="listen-pill-wrap">
-        <a href="https://play.reelcrafter.com/TZlmAAmJQa2n3CMAsu3lPw" target="_blank" rel="noopener noreferrer" class="floating-pill floating-pill--static" id="listen-pill" data-i18n-aria="listenPillAria">
-          <span class="floating-pill-text" data-i18n="listenPill">Listen to more</span>
-          <span class="floating-pill-btn" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-          </span>
-        </a>
+        <button type="button" class="hero-cta-btn" id="listen-contact-cta" data-i18n="contactCtaBtn" aria-haspopup="dialog">Get in touch</button>
       </div>
     </section>
   </main>
@@ -466,6 +461,6 @@
     </div>
   </div>
 
-  <script src="script.js?v=11" defer></script>
+  <script src="script.js?v=24" defer></script>
 </body>
 </html>
