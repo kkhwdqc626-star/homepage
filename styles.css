@@ -1808,7 +1808,7 @@ label[for] {
   animation: none;
 }
 
-/* About Demo Tracks - music player (~½ viewport width, centered) */
+/* Listen — ReelCrafter embed (replaces inline demo tracks) */
 .about-demos {
   width: min(50vw, 100%);
   margin-left: auto;
@@ -1817,6 +1817,29 @@ label[for] {
   padding-top: var(--spacing-2xl);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   box-sizing: border-box;
+}
+
+.about-demos--reel {
+  width: 100%;
+  max-width: 840px;
+}
+
+.listen-reel-wrap {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+.listen-reel-iframe {
+  display: block;
+  width: 100%;
+  min-height: 480px;
+  height: min(72vh, 720px);
+  border: 0;
 }
 
 .about-demos-title {
