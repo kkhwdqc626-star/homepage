@@ -884,12 +884,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!st.locked) {
         const tdx = e.clientX - st.startX;
         const tdy = e.clientY - st.startY;
-        if (Math.abs(tdy) > Math.abs(tdx) && Math.abs(tdy) > 10) {
+        if (Math.abs(tdy) > Math.abs(tdx) && Math.abs(tdy) > 6) {
           galleryPointerDragById.delete(e.pointerId);
           galleryTouchPointerIds.delete(e.pointerId);
           return;
         }
-        if (Math.abs(tdx) <= 10 || Math.abs(tdx) <= Math.abs(tdy)) return;
+        if (Math.abs(tdx) <= 6 || Math.abs(tdx) <= Math.abs(tdy)) return;
         st.locked = true;
         st.lastSampleX = e.clientX;
         st.lastSampleT = performance.now();
@@ -924,9 +924,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const half = getHalfWidth(row);
       const o = normalizeOffset(getOffset(row) - v * dt, half);
       setOffset(row, o);
-      v *= Math.exp(-0.0045 * dt);
+      v *= Math.exp(-0.003 * dt);
       state.v = v;
-      if (Math.abs(v) < 0.00055) doneRows.push(row);
+      if (Math.abs(v) < 0.0004) doneRows.push(row);
     });
     if (doneRows.length) {
       doneRows.forEach((row) => galleryInertiaByRow.delete(row));

@@ -1168,13 +1168,11 @@ label[for] {
 /* Phones + narrow windows: portrait tiles and tighter chrome */
 @media (max-width: 900px) {
   .gallery-item {
-    /* Narrow tiles: aspect matches Those Who Follow poster (mitlaeufer, 900×1273), not 9:16 */
-    /* Bias crop toward upper frame (override per card via --gallery-cover-*) */
     --gallery-cover-x: 50%;
     --gallery-cover-y: 24%;
     scroll-snap-align: start;
     width: min(
-      210px,
+      230px,
       calc(100vw - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px))
     );
     aspect-ratio: 900 / 1273;
@@ -1217,6 +1215,7 @@ label[for] {
 
   .gallery-row .gallery-item {
     touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
     transition: none;
   }
 
@@ -1227,8 +1226,23 @@ label[for] {
   }
 
   .gallery-arrow {
-    display: none !important;
+    display: flex;
+    z-index: 4;
+    width: 44px;
+    height: 44px;
+    opacity: 0.7;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
+
+  .gallery-arrow:active:not(:disabled) {
+    background: rgba(255, 255, 255, 0.22);
+    transform: translateY(-50%) scale(0.92);
+  }
+
+  .gallery-arrow-prev { left: var(--spacing-xs); }
+  .gallery-arrow-next { right: var(--spacing-xs); }
 }
 
 /* Work spotlight — Apple Education “Apps for whatever you’re into” tabbed layout (below carousel) */
@@ -2275,45 +2289,53 @@ label[for] {
 .footer-inner {
   max-width: var(--max-width-wide);
   margin: 0 auto;
-  padding: var(--spacing-xl) var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
   border-top: 1px solid var(--footer-border);
   box-sizing: border-box;
 }
 
-.footer-content {
+.footer-top {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-md);
-  font-size: clamp(13px, 0.2rem + 2.6vw, 15px);
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs) var(--spacing-lg);
+  padding-bottom: var(--spacing-xs);
+  font-size: 12px;
   color: var(--color-gray-light);
 }
 
-.footer-row {
+.footer-links {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   align-items: center;
-  gap: 0 var(--spacing-sm);
-  text-align: center;
+  gap: 0;
+  padding-top: var(--spacing-xs);
+  font-size: 12px;
+  color: var(--color-gray-light);
 }
 
-/* Apple-style footer: links are grey, not blue */
-.footer-content a {
+.footer-links a {
   color: var(--color-gray-light);
   text-decoration: none;
   transition: color var(--transition-fast);
+  padding: 0 0.6em;
 }
 
-.footer-content a:hover {
+.footer-links a:first-child {
+  padding-left: 0;
+}
+
+.footer-links a:hover {
   color: var(--color-gray);
   text-decoration: underline;
 }
 
 .footer-sep {
   color: var(--color-gray-light);
-  opacity: 0.7;
+  opacity: 0.4;
   user-select: none;
+  font-size: 11px;
 }
 
 .footer-copyright,
@@ -2411,7 +2433,7 @@ label[for] {
 
   /* Dim + blur: opacity/backdrop animate both open and close (no display toggle) */
   .nav-mobile-backdrop {
-    display: block;
+    display: none;
     position: fixed;
     inset: 0;
     z-index: 10010;
@@ -2458,7 +2480,7 @@ label[for] {
   }
 
   .nav-divider--mobile {
-    display: block;
+    display: none;
   }
 
   .nav-end {
@@ -2467,59 +2489,55 @@ label[for] {
     align-items: center;
   }
 
-  /* Sheet: always fixed on narrow viewports; opacity/transform transition open + close */
   .nav-links {
     display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0;
-    position: fixed;
-    left: max(12px, env(safe-area-inset-left, 0px));
-    right: max(12px, env(safe-area-inset-right, 0px));
-    top: calc(env(safe-area-inset-top, 0px) + 72px);
-    padding: 8px 0;
+    flex-direction: row;
+    align-items: center;
+    gap: 2px;
+    position: static;
+    padding: 0;
     margin: 0;
-    background: rgba(12, 12, 14, 0.96);
-    backdrop-filter: saturate(200%) blur(16px);
-    -webkit-backdrop-filter: saturate(200%) blur(16px);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
-    z-index: 10020;
-    transform-origin: top center;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transform: scale(0.97) translateY(-6px);
-    transition:
-      opacity 0.24s var(--ease-out-snappy),
-      transform 0.24s var(--ease-out-snappy),
-      visibility 0s linear 0.24s;
+    background: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    z-index: auto;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+    transition: none;
   }
 
   .nav.open .nav-links {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    transform: scale(1) translateY(0);
-    transition:
-      opacity 0.26s var(--ease-out-snappy),
-      transform 0.26s var(--ease-out-snappy),
-      visibility 0s;
+    transform: none;
+    transition: none;
   }
 
   .nav-links a {
-    padding: 14px 20px;
-    font-size: 17px;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.92);
+    padding: 0;
+    font-size: 0;
+    color: rgba(255, 255, 255, 0.85);
     text-decoration: none;
     min-height: 44px;
+    min-width: 44px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    border-radius: 12px;
-    margin: 0 8px;
+    justify-content: center;
+    gap: 0;
+    border-radius: 50%;
+    margin: 0;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s ease;
+  }
+
+  .nav-links a > span:not(.nav-link-icon) {
+    display: none;
   }
 
   .nav-link-icon {
@@ -2529,7 +2547,7 @@ label[for] {
     flex-shrink: 0;
     width: 22px;
     height: 22px;
-    color: rgba(255, 255, 255, 0.88);
+    color: rgba(255, 255, 255, 0.85);
   }
 
   .nav-link-icon svg {
@@ -2539,18 +2557,12 @@ label[for] {
   }
 
   .nav-links a:active {
-    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
   }
 
   .nav-toggle {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
-    min-width: 44px;
-    min-height: 44px;
-    padding: 10px;
+    display: none !important;
     margin-left: 0;
     flex-shrink: 0;
     border-radius: 12px;
