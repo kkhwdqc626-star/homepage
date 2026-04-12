@@ -1322,7 +1322,7 @@ label[for] {
 /* Segmented control — grouped track (Apple-style capsule rail); width fits tab labels */
 .apps-gallery-tabs-shell {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-self: center;
   position: relative;
   z-index: 1;
@@ -2085,7 +2085,7 @@ label[for] {
   font-weight: 700;
   letter-spacing: -0.035em;
   line-height: 1.08;
-  color: var(--contact-gold);
+  color: #7B82B8;
   margin: 0;
   max-width: none;
   white-space: pre-line;
