@@ -418,6 +418,10 @@ label[for] {
   opacity: 0.85;
 }
 
+.nav-logo-initials {
+  display: none;
+}
+
 .nav-menu {
   display: flex;
   align-items: center;
@@ -2468,11 +2472,15 @@ label[for] {
   }
 
   .nav-logo {
-    min-width: 0;
-    max-width: min(200px, 42vw);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: flex;
+  }
+
+  .nav-logo-full {
+    display: none;
+  }
+
+  .nav-logo-initials {
+    display: inline;
   }
 
   .nav-divider--desktop {
@@ -2493,7 +2501,7 @@ label[for] {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 2px;
+    gap: 0;
     position: static;
     padding: 0;
     margin: 0;
