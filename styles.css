@@ -928,7 +928,7 @@ label[for] {
 
 /* Tight stack under Work spotlight: avoid default .section 4xl top padding (set via sibling rule). */
 .section-apps-gallery + .section.section-gallery {
-  padding-top: clamp(var(--spacing-sm), 2vw, var(--spacing-lg));
+  padding-top: var(--spacing-sm);
 }
 
 .gallery-container {
@@ -1253,9 +1253,9 @@ label[for] {
 .section-apps-gallery {
   overflow-x: clip;
   overflow-y: visible;
-  padding-top: var(--spacing-xl);
+  padding-top: var(--spacing-sm);
   /* JS sets --spotlight-desc-trail-gap from active description height (shorter copy → smaller gap to #gallery). */
-  padding-bottom: var(--spotlight-desc-trail-gap, var(--spacing-xl));
+  padding-bottom: var(--spotlight-desc-trail-gap, var(--spacing-md));
   max-width: none;
   padding-left: 0;
   padding-right: 0;
@@ -1346,7 +1346,7 @@ label[for] {
   z-index: 1;
   width: fit-content;
   max-width: 100%;
-  margin: 0 auto;
+  margin: 8px auto 0;
   padding: 2px;
   border-radius: 980px;
   background: rgba(255, 255, 255, 0.06);
@@ -1449,7 +1449,7 @@ label[for] {
   max-width: none;
   margin: 0;
   overflow: visible;
-  padding: 12px 0 20px;
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -1468,8 +1468,8 @@ label[for] {
   /* Programmatic scroll uses JS easing; keep auto so it doesn’t fight rAF */
   scroll-behavior: auto;
   scroll-padding-inline: max(16px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
-  padding-top: 8px;
-  padding-bottom: 16px;
+  padding-top: 0;
+  padding-bottom: 0;
   padding-left: max(20px, env(safe-area-inset-left, 0px), calc(50% - min(310px, 47vw)));
   padding-right: max(20px, env(safe-area-inset-right, 0px), calc(50% - min(310px, 47vw)));
   -webkit-overflow-scrolling: touch;
@@ -1584,7 +1584,7 @@ label[for] {
 }
 
 .apps-gallery-caption {
-  padding: var(--spacing-md) var(--spacing-sm) var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-sm) var(--spacing-md);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -2378,7 +2378,7 @@ label[for] {
 
   .section-apps-gallery {
     padding-top: var(--spacing-md);
-    padding-bottom: var(--spotlight-desc-trail-gap, var(--spacing-lg));
+    padding-bottom: var(--spotlight-desc-trail-gap, var(--spacing-sm));
     padding-left: 0;
     padding-right: 0;
   }
