@@ -3,6 +3,22 @@
  * Apple-inspired interactions (performance-optimized)
  */
 
+// #region agent log
+window.addEventListener('load', () => {
+  const perf = performance.getEntriesByType('navigation')[0];
+  const paint = performance.getEntriesByType('paint');
+  const resources = performance.getEntriesByType('resource');
+  const totalTransfer = resources.reduce((s, r) => s + (r.transferSize || 0), 0);
+  const imgResources = resources.filter(r => r.initiatorType === 'img');
+  const imgTransfer = imgResources.reduce((s, r) => s + (r.transferSize || 0), 0);
+  fetch('http://127.0.0.1:7710/ingest/7cee6fc4-f978-4891-b24c-239976c02e66',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'22a8fb'},body:JSON.stringify({sessionId:'22a8fb',location:'script.js:perfMetrics',message:'page load performance',data:{domContentLoaded:Math.round(perf?.domContentLoadedEventEnd),loadEvent:Math.round(perf?.loadEventEnd),fcp:paint.find(p=>p.name==='first-contentful-paint')?.startTime,lcp:'pending',totalTransferKB:Math.round(totalTransfer/1024),imgTransferKB:Math.round(imgTransfer/1024),resourceCount:resources.length,imgCount:imgResources.length,largestImgs:imgResources.sort((a,b)=>(b.transferSize||0)-(a.transferSize||0)).slice(0,5).map(r=>({name:r.name.split('/').pop(),kb:Math.round((r.transferSize||0)/1024)}))},timestamp:Date.now()})}).catch(()=>{});
+  new PerformanceObserver((list) => {
+    const lcp = list.getEntries().pop();
+    fetch('http://127.0.0.1:7710/ingest/7cee6fc4-f978-4891-b24c-239976c02e66',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'22a8fb'},body:JSON.stringify({sessionId:'22a8fb',location:'script.js:lcp',message:'LCP entry',data:{lcpTime:Math.round(lcp.startTime),element:lcp.element?.tagName,url:lcp.url,size:lcp.size},timestamp:Date.now()})}).catch(()=>{});
+  }).observe({type:'largest-contentful-paint',buffered:true});
+});
+// #endregion
+
 function debounce(fn, ms) {
   let t;
   return function (...args) {
@@ -69,7 +85,7 @@ const TRANSLATIONS = {
     galleryAlt4: 'Catalyst Institute — Funkhaus Berlin campus',
     galleryAlt5: 'Chrisna Lungala — panel speaker at industry event',
     gallerySpotDesc0:
-      "I\u2019m a composer based in Munich, and I write music for films and other visual media. I\u2019m self-taught, and I received the German Film Music Award for Young Talent in 2023, which meant a lot to me early on.\n\nOver the years I\u2019ve had the chance to work on projects that were recognised at the Student Academy Awards\u00ae and Cannes, and I\u2019ve done freelance work for studios like Hans Zimmer\u2019s Bleeding Fingers Music, 2WEI and Invisible Arts.\n\nI believe music can be simple and complex at the same time. For me, the most important part of the process is understanding how the story. That allows me to find a unique sound that supports it. Whether it\u2019s a quiet documentary, a drama or something more experimental, I want the music to feel like it belongs to the story.",
+      "I\u2019m a composer based in Munich, and I write music for films and other visual media. I\u2019m self-taught, and I received the German Film Music Award for Young Talent in 2023, which meant a lot to me early on.\n\nOver the years I\u2019ve had the chance to work on projects that were recognised at the Student Academy Awards\u00ae and Cannes, and I\u2019ve done freelance work for studios like Hans Zimmer\u2019s Bleeding Fingers Music, 2WEI and Invisible Arts.\n\nI believe music can be simple and complex at the same time. For me, the most important part of the process is understanding what the story is all about and how I can contribute to the narrative. That allows me to find a unique sound that supports it. Whether it\u2019s a quiet documentary, a drama or something more experimental, I want the music to feel like it belongs to the story.",
     gallerySpotDesc1:
       "Berlin film students Julius and Moritz spent over three years creating their animated film BUTTY, hoping it'd launch their careers. Their dreams were dashed when a film festival rejected their submission, citing disqualification. The film was already available online and credited to a U.S. filmmaker, forcing the students to withdraw.\n\nFurther investigation revealed that the American student Samuel Felinton stole their film, altered the title and credits, and gained recognition at festivals and on U.S. television. Hailed as a potential \"Walt Disney of the 21st century,\" his fraudulent rise leaves the students fighting for credit and questions his willingness to maintain his stolen spotlight.",
     gallerySpotDesc2:
@@ -187,7 +203,7 @@ const TRANSLATIONS = {
     galleryAlt4: 'Catalyst Institute — Funkhaus Berlin Campus',
     galleryAlt5: 'Chrisna Lungala — Panelsprecher bei Branchenveranstaltung',
     gallerySpotDesc0:
-      'Ich bin Komponist und lebe in M\u00fcnchen, wo ich Musik f\u00fcr Filme und andere visuelle Medien schreibe. Ich bin Autodidakt und habe den Deutschen Filmmusikpreis f\u00fcr Nachwuchs erhalten, was mir gerade am Anfang viel bedeutet hat.\n\nIm Laufe der Jahre durfte ich an Projekten mitwirken, die bei den Student Academy Awards\u00ae und in Cannes anerkannt wurden, und ich habe als Freelancer f\u00fcr Studios wie Hans Zimmers Bleeding Fingers Music, 2WEI und Invisible Arts gearbeitet.\n\nIch glaube, dass Musik gleichzeitig einfach und komplex sein kann. F\u00fcr mich ist das Wichtigste, zu verstehen, wie der Regisseur seine Geschichte sieht. Das erm\u00f6glicht es mir, einen eigenen Klang zu finden, der seine Vision tr\u00e4gt. Ob ruhiger Dokumentarfilm, Drama oder etwas Experimentelleres \u2013 die Musik soll sich anf\u00fchlen, als geh\u00f6re sie zur Geschichte.',
+      'Ich bin Komponist und lebe in M\u00fcnchen, wo ich Musik f\u00fcr Filme und andere visuelle Medien schreibe. Ich bin Autodidakt und habe den Deutschen Filmmusikpreis f\u00fcr Nachwuchs erhalten, was mir gerade am Anfang viel bedeutet hat.\n\nIm Laufe der Jahre durfte ich an Projekten mitwirken, die bei den Student Academy Awards\u00ae und in Cannes anerkannt wurden, und ich habe als Freelancer f\u00fcr Studios wie Hans Zimmers Bleeding Fingers Music, 2WEI und Invisible Arts gearbeitet.\n\nIch glaube, dass Musik gleichzeitig einfach und komplex sein kann. F\u00fcr mich ist das Wichtigste, zu verstehen, was RegisseurInnen mit ihren Geschichten aussagen wollen. Das erm\u00f6glicht es mir, einen eigenen Klang zu finden, der seine Vision tr\u00e4gt. Ob ruhiger Dokumentarfilm, Drama oder etwas Experimentelleres \u2013 die Musik soll sich anf\u00fchlen, als geh\u00f6re sie zur Geschichte.',
     gallerySpotDesc1:
       'Die Berliner Filmstudenten Julius und Moritz verbrachten mehr als drei Jahre mit ihrem Animationsfilm BUTTY, in der Hoffnung, damit ihre Karriere zu starten. Ihre Träume zerplatzten, als ein Filmfestival ihre Einreichung ablehnte und Disqualifikation anführte: Der Film sei bereits online und einem US-amerikanischen Filmemacher zugeschrieben gewesen, sodass die Studenten zurückziehen mussten.\n\nWeitere Recherchen ergaben, dass der amerikanische Student Samuel Felinton ihren Film gestohlen, Titel und Credits geändert und Anerkennung auf Festivals und im US-Fernsehen erlangt hatte. Als potenzieller „Walt Disney des 21. Jahrhunderts“ gefeiert, wirft sein betrügerischer Aufstieg die Studenten in einen Kampf um Anerkennung auf und stellt die Frage, ob er seinen gestohlenen Ruhm zu halten bereit ist.',
     gallerySpotDesc2:
