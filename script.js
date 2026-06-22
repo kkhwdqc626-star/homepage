@@ -687,36 +687,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Smooth reveal on scroll (subtle fade-in for sections) — skip when reduced motion
-  const prefersReducedMotionReveal = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const sections = document.querySelectorAll('.section');
-  if (prefersReducedMotionReveal) {
-    sections.forEach((section) => {
-      section.style.opacity = '1';
-      section.style.transform = 'none';
-    });
-  } else {
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
+  // Scroll-reveal — individual content blocks fade up as they enter the viewport,
+  // mirroring the per-item reveal on Apple's macOS marketing page. Hero is intentionally
+  // excluded; it should be present at first paint with no animation.
+  const revealPrefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const revealSelectors = [
+    '.section-title',
+    '.apps-gallery-scroller-wrap',
+    '.apps-gallery-tabs-shell',
+    '.apps-gallery-desc-shell',
+    '.gallery-row-container',
+    '.listen-reel-wrap',
+    '.listen-apple-wrap',
+    '.listen-pill-wrap',
+    '.footer'
+  ];
+  const revealTargets = document.querySelectorAll(revealSelectors.join(','));
 
-    const observer = new IntersectionObserver((entries) => {
+  if (revealPrefersReduced || !('IntersectionObserver' in window)) {
+    // No motion: leave items in their natural state; do not add .reveal at all.
+  } else {
+    revealTargets.forEach((el) => el.classList.add('reveal'));
+    const revealObserver = new IntersectionObserver((entries, obs) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
-          observer.unobserve(entry.target);
+          entry.target.classList.add('is-revealed');
+          obs.unobserve(entry.target);
         }
       });
-    }, observerOptions);
-
-    sections.forEach((section) => {
-      section.style.opacity = '0';
-      section.style.transform = 'translateY(20px)';
-      section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-      observer.observe(section);
+    }, {
+      threshold: 0,
+      // Trigger when the item's top edge passes ~88% down the viewport, matching Apple's pacing.
+      rootMargin: '0px 0px -12% 0px'
     });
+    revealTargets.forEach((el) => revealObserver.observe(el));
   }
 
   // Accordion (privacy page - Apple Wallet Q&A style)

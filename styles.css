@@ -164,6 +164,29 @@ label[for] {
   touch-action: manipulation;
 }
 
+/* Scroll-reveal — items fade up as they enter the viewport (Apple macOS-page pattern).
+   Initial hidden state lives in CSS so there's no flash before the deferred script paints. */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 40px, 0);
+  transition: opacity 0.9s var(--ease-out-snappy), transform 0.9s var(--ease-out-snappy);
+  will-change: opacity, transform;
+}
+
+.reveal.is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+}
+
 /* Skip Link - Accessibility */
 .skip-link {
   position: absolute;
